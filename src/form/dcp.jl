@@ -5,7 +5,7 @@ Creates Ohms constraints for shiftable PSTs / OLTCs
 p[f_idx] == -b*((t[f_bus] - t_shift[f_idx]) - (t[t_bus] - t_shift[t_idx]))
 ```
 """
-function constraint_variable_transformer_y_from{T <: AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
+function constraint_variable_transformer_y_from{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
     p_fr = pm.var[:p][f_idx]
     va_fr = pm.var[:va][f_bus]
     va_to = pm.var[:va][t_bus]
@@ -17,7 +17,7 @@ function constraint_variable_transformer_y_from{T <: AbstractDCPForm}(pm::Generi
 end
 
 "Do nothing, this model is symmetric"
-constraint_variable_transformer_y_to{T <: AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max) = Set()
+constraint_variable_transformer_y_to{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max) = Set()
 
 "Do nothing, there are no voltage magnitude variables"
-constraint_link_voltage_magnitudes{T <: AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to) = Set()
+constraint_link_voltage_magnitudes{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to) = Set()
