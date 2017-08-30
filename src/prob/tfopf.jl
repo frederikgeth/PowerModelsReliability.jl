@@ -12,7 +12,7 @@ end
 
 ""
 function run_tfopf(file, model_constructor, solver; kwargs...)
-    return run_generic_model(file, model_constructor, solver, post_tfopf; kwargs...)
+    return run_generic_model(file, model_constructor, solver, post_tfopf; solution_builder = get_solution_tf, kwargs...)
 end
 
 ""
