@@ -21,3 +21,31 @@ constraint_variable_transformer_y_to{T <: PowerModels.AbstractDCPForm}(pm::Gener
 
 "Do nothing, there are no voltage magnitude variables"
 constraint_link_voltage_magnitudes{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to) = Set()
+
+
+""
+function constraint_kcl_shunt_aggregated{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, i, bus_arcs, bus_arcs_dc, gs, bs)
+    p = pm.var[:p]
+    p_dc = pm.var[:p_dc]
+    pnode = pm.var[:pnode][i]
+
+    @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - gs*1.0^2)
+    # omit reactive constraint
+end
+
+
+function constraint_flexible_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, gen)
+        constraint_flexible_active_gen(pm, gen)
+end
+
+function constraint_flexible_load{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, load)
+        constraint_flexible_active_gen(pm, load)
+end
+
+function contraint_load_gen_aggregation_sheddable{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, bus)
+    contraint_active_load_gen_aggregation_sheddable(pm, bus)
+end
+
+function contraint_load_gen_aggregation{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, bus)
+        contraint_active_load_gen_aggregation(pm, bus)
+end

@@ -7,6 +7,9 @@ function get_solution_tf(pm::GenericPowerModel)
     PowerModels.add_dcline_flow_setpoint(sol, pm)
     add_branch_shift_setpoint(sol, pm)
     add_branch_tap_setpoint(sol, pm)
+    add_load_power_setpoint(sol, pm)
+    add_nodal_power_setpoint(sol, pm)
+    add_pdelta(sol, pm)
     return sol
 end
 
@@ -43,4 +46,22 @@ function add_branch_tap_setpoint(sol, pm::GenericPowerModel)
         catch
         end
     end
+end
+
+function add_load_power_setpoint(sol, pm::GenericPowerModel)
+    mva_base = pm.data["baseMVA"]
+    PowerModels.add_setpoint(sol, pm, "load", "pl", :pl)
+    PowerModels.add_setpoint(sol, pm, "load", "ql", :ql)
+end
+
+function add_nodal_power_setpoint(sol, pm::GenericPowerModel)
+    mva_base = pm.data["baseMVA"]
+    PowerModels.add_setpoint(sol, pm, "bus", "pnode", :pnode)
+    PowerModels.add_setpoint(sol, pm, "bus", "qnode", :qnode)
+end
+
+function add_pdelta(sol, pm::GenericPowerModel)
+    mva_base = pm.data["baseMVA"]
+    PowerModels.add_setpoint(sol, pm, "load", "pdelta", :pl_delta)
+    PowerModels.add_setpoint(sol, pm, "gen", "pdelta", :pg_delta)
 end

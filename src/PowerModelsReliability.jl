@@ -9,8 +9,13 @@ PMs = PowerModels
 
 include("core/variable.jl")
 include("core/constraint_template.jl")
+include("core/constraint.jl")
 include("core/solution.jl")
+include("core/base.jl")
+include("core/objective.jl")
+include("core/data.jl")
 include("form/acp.jl")
 include("form/dcp.jl")
 include("prob/tfopf.jl")
+include("prob/unittfopf.jl")
 end

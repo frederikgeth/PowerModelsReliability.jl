@@ -69,3 +69,23 @@ function constraint_link_voltage_magnitudes{T <: PowerModels.AbstractACPForm}(pm
     @constraint(pm.model, vm_tap_fr * tap_fr == vm_fr)
     @constraint(pm.model, vm_tap_to * tap_to == vm_to)
 end
+
+"""
+Aggregated unit representation in the nodes
+```
+sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - gs*v^2
+sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode + bs*v^2
+```
+"""
+function constraint_kcl_shunt_aggregated{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, i, bus_arcs, bus_arcs_dc, gs, bs)
+    vm = pm.var[:vm][i]
+    p = pm.var[:p]
+    q = pm.var[:q]
+    pnode = pm.var[:pnode][i]
+    qnode = pm.var[:qnode][i]
+    p_dc = pm.var[:p_dc]
+    q_dc = pm.var[:q_dc]
+
+    @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - gs*vm^2)
+    @constraint(pm.model, sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode + bs*vm^2)
+end
