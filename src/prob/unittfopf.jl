@@ -33,39 +33,43 @@ function post_unittfopf(pm::GenericPowerModel)
     objective_min_redispatch_cost(pm)
 
     PowerModels.constraint_voltage(pm)
-    for (i,bus) in pm.ref[:ref_buses]
-        PowerModels.constraint_theta_ref(pm, bus)
+    for i in PowerModels.ids(pm, :ref_buses)
+        PowerModels.constraint_theta_ref(pm, i)
     end
 
-    for (i,bus) in pm.ref[:bus]
-        constraint_kcl_shunt_aggregated(pm, bus)
-        contraint_load_gen_aggregation_sheddable(pm, bus)
+    for i in PowerModels.ids(pm, :bus)
+        constraint_kcl_shunt_aggregated(pm, i)
+        contraint_load_gen_aggregation_sheddable(pm, i)
     end
-    for (i,load) in pm.ref[:load]
-        #constraint_flexible_load(pm, load)
-        constraint_redispatch_power_load(pm, load)
+    print(PowerModels.ids(pm, :load))
+    # for i in PowerModels.ids(pm, :load)
+    #     #constraint_flexible_load(pm, i)
+    #     constraint_redispatch_power_load(pm, i)
+    # end
+    print(PowerModels.ids(pm, :gen))
+
+    for i in PowerModels.ids(pm, :gen)
+        #constraint_flexible_gen(pm, i)
+        constraint_redispatch_power_gen(pm, i)
     end
 
-    for (i,gen) in pm.ref[:gen]
-        #constraint_flexible_gen(pm, gen)
-        constraint_redispatch_power_gen(pm, gen)
-    end
+    for i in PowerModels.ids(pm, :branch)
+        branch = PowerModels.ref(pm, :branch, i)
 
-    for (i,branch) in pm.ref[:branch]
         if branch["shiftable"] == false && branch["tappable"] == false
-            PowerModels.constraint_ohms_yt_from(pm, branch)
-            PowerModels.constraint_ohms_yt_to(pm, branch)
-            constraint_link_voltage_magnitudes(pm, branch)
+            PowerModels.constraint_ohms_yt_from(pm, i)
+            PowerModels.constraint_ohms_yt_to(pm, i)
+            constraint_link_voltage_magnitudes(pm, i)
         else
-            constraint_variable_transformer_y_from(pm, branch)
-            constraint_variable_transformer_y_to(pm, branch)
+            constraint_variable_transformer_y_from(pm, i)
+            constraint_variable_transformer_y_to(pm, i)
         end
-        PowerModels.constraint_voltage_angle_difference(pm, branch)
+        PowerModels.constraint_voltage_angle_difference(pm, i)
 
-        PowerModels.constraint_thermal_limit_from(pm, branch)
-        PowerModels.constraint_thermal_limit_to(pm, branch)
+        PowerModels.constraint_thermal_limit_from(pm, i)
+        PowerModels.constraint_thermal_limit_to(pm, i)
     end
-    for (i,dcline) in pm.ref[:dcline]
-        PowerModels.constraint_dcline(pm, dcline)
+    for i in PowerModels.ids(pm, :dcline)
+        PowerModels.constraint_dcline(pm, i)
     end
 end

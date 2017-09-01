@@ -8,16 +8,16 @@ vm_tap[f_idx] * tap_min <= vm[f_bus] <= vm_tap[f_idx] * tap_max
 ```
 """
 function constraint_variable_transformer_y_from{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
-    p_fr = pm.var[:p][f_idx]
-    q_fr = pm.var[:q][f_idx]
-    vm_fr = pm.var[:vm][f_bus]
-    vm_to = pm.var[:vm][t_bus]
-    va_fr = pm.var[:va][f_bus]
-    va_to = pm.var[:va][t_bus]
-    va_shift_fr = pm.var[:va_shift][f_idx]
-    va_shift_to = pm.var[:va_shift][t_idx]
-    vm_tap_fr = pm.var[:vm_tap][f_idx]
-    vm_tap_to = pm.var[:vm_tap][t_idx]
+    p_fr = PowerModels.var(pm, :p)[f_idx]
+    q_fr = PowerModels.var(pm, :q)[f_idx]
+    vm_fr = PowerModels.var(pm, :vm)[f_bus]
+    vm_to = PowerModels.var(pm, :vm)[t_bus]
+    va_fr = PowerModels.var(pm, :va)[f_bus]
+    va_to = PowerModels.var(pm, :va)[t_bus]
+    va_shift_fr = PowerModels.var(pm, :va_shift)[f_idx]
+    va_shift_to = PowerModels.var(pm, :va_shift)[t_idx]
+    vm_tap_fr = PowerModels.var(pm, :vm_tap)[f_idx]
+    vm_tap_to = PowerModels.var(pm, :vm_tap)[t_idx]
 
     @NLconstraint(pm.model, p_fr == (g + g_shunt / 2)*vm_tap_fr^2 + (-g)*(vm_tap_fr*vm_tap_to*cos((va_fr - va_shift_fr) - (va_to - va_shift_to))) + (-b)*(vm_tap_fr*vm_tap_to*sin((va_fr - va_shift_fr) - (va_to - va_shift_to))))
     @NLconstraint(pm.model, q_fr == -(b+c/2)*vm_tap_fr^2 - (-b)*(vm_tap_fr*vm_tap_to*cos((va_fr - va_shift_fr) - (va_to - va_shift_to))) + (-g)*(vm_tap_fr*vm_tap_to*sin((va_fr - va_shift_fr) - (va_to - va_shift_to))))
@@ -35,16 +35,16 @@ vm_tap[t_idx] * tap_min <= vm[t_bus] <= vm_tap[t_idx] * tap_max
 ```
 """
 function constraint_variable_transformer_y_to{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
-    p_to = pm.var[:p][t_idx]
-    q_to = pm.var[:q][t_idx]
-    vm_fr = pm.var[:vm][f_bus]
-    vm_to = pm.var[:vm][t_bus]
-    va_fr = pm.var[:va][f_bus]
-    va_to = pm.var[:va][t_bus]
-    va_shift_fr = pm.var[:va_shift][f_idx]
-    va_shift_to = pm.var[:va_shift][t_idx]
-    vm_tap_fr = pm.var[:vm_tap][f_idx]
-    vm_tap_to = pm.var[:vm_tap][t_idx]
+    p_to = PowerModels.var(pm, :p)[t_idx]
+    q_to = PowerModels.var(pm, :q)[t_idx]
+    vm_fr = PowerModels.var(pm, :vm)[f_bus]
+    vm_to = PowerModels.var(pm, :vm)[t_bus]
+    va_fr = PowerModels.var(pm, :va)[f_bus]
+    va_to = PowerModels.var(pm, :va)[t_bus]
+    va_shift_fr = PowerModels.var(pm, :va_shift)[f_idx]
+    va_shift_to = PowerModels.var(pm, :va_shift)[t_idx]
+    vm_tap_fr = PowerModels.var(pm, :vm_tap)[f_idx]
+    vm_tap_to = PowerModels.var(pm, :vm_tap)[t_idx]
 
     @NLconstraint(pm.model, p_to == (g + g_shunt / 2)*vm_tap_to^2 + (-g)*(vm_tap_to*vm_tap_fr*cos((va_to - va_shift_to) - (va_fr - va_shift_fr))) + (-b)*(vm_tap_to*vm_tap_fr*sin((va_to - va_shift_to) - (va_fr - va_shift_fr))))
     @NLconstraint(pm.model, q_to == -(b+c/2)*vm_tap_to^2 - (-b)*(vm_tap_to*vm_tap_fr*cos((va_to - va_shift_to) - (va_fr - va_shift_fr))) + (-g)*(vm_tap_to*vm_tap_fr*sin((va_to - va_shift_to) - (va_fr - va_shift_fr))))
@@ -62,10 +62,10 @@ vm_tap[t_idx] * tap == vm[t_bus]
 """
 
 function constraint_link_voltage_magnitudes{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to)
-    vm_fr = pm.var[:vm][f_bus]
-    vm_to = pm.var[:vm][t_bus]
-    vm_tap_fr = pm.var[:vm_tap][f_idx]
-    vm_tap_to = pm.var[:vm_tap][t_idx]
+    vm_fr = PowerModels.var(pm, :vm)[f_bus]
+    vm_to = PowerModels.var(pm, :vm)[t_bus]
+    vm_tap_fr = PowerModels.var(pm, :vm_tap)[f_idx]
+    vm_tap_to = PowerModels.var(pm, :vm_tap)[t_idx]
     @constraint(pm.model, vm_tap_fr * tap_fr == vm_fr)
     @constraint(pm.model, vm_tap_to * tap_to == vm_to)
 end
@@ -78,13 +78,13 @@ sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode +
 ```
 """
 function constraint_kcl_shunt_aggregated{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, i, bus_arcs, bus_arcs_dc, gs, bs)
-    vm = pm.var[:vm][i]
-    p = pm.var[:p]
-    q = pm.var[:q]
-    pnode = pm.var[:pnode][i]
-    qnode = pm.var[:qnode][i]
-    p_dc = pm.var[:p_dc]
-    q_dc = pm.var[:q_dc]
+    vm = PowerModels.var(pm, :vm)[i]
+    p = PowerModels.var(pm, :p)
+    q = PowerModels.var(pm, :q)
+    pnode = PowerModels.var(pm, :pnode)[i]
+    qnode = PowerModels.var(pm, :qnode)[i]
+    p_dc = PowerModels.var(pm, :p_dc)
+    q_dc = PowerModels.var(pm, :q_dc)
 
     @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - gs*vm^2)
     @constraint(pm.model, sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode + bs*vm^2)

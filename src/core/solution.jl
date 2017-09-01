@@ -1,5 +1,5 @@
 ""
-function get_solution_tf(pm::GenericPowerModel)
+function get_solution_tf(pm::GenericPowerModel, sol_nw)
     sol = PowerModels.init_solution(pm)
     PowerModels.add_bus_voltage_setpoint(sol, pm)
     PowerModels.add_generator_power_setpoint(sol, pm)
