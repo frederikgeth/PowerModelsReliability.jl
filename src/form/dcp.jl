@@ -6,11 +6,11 @@ p[f_idx] == -b*((t[f_bus] - t_shift[f_idx]) - (t[t_bus] - t_shift[t_idx]))
 ```
 """
 function constraint_variable_transformer_y_from{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
-    p_fr = pm.var[:p][f_idx]
-    va_fr = pm.var[:va][f_bus]
-    va_to = pm.var[:va][t_bus]
-    va_shift_fr = pm.var[:va_shift][f_idx]
-    va_shift_to = pm.var[:va_shift][t_idx]
+    p_fr = PowerModels.var(pm, :p)[f_idx]
+    va_fr = PowerModels.var(pm, :va)[f_bus]
+    va_to = PowerModels.var(pm, :va)[t_bus]
+    va_shift_fr = PowerModels.var(pm, :va_shift)[f_idx]
+    va_shift_to = PowerModels.var(pm, :va_shift)[t_idx]
 
     @constraint(pm.model, p_fr ==  g_shunt/2 + (-b)*((va_fr - va_shift_fr) - (va_to - va_shift_to)))
     # omit reactive constraint
@@ -25,9 +25,9 @@ constraint_link_voltage_magnitudes{T <: PowerModels.AbstractDCPForm}(pm::Generic
 
 ""
 function constraint_kcl_shunt_aggregated{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, i, bus_arcs, bus_arcs_dc, gs, bs)
-    p = pm.var[:p]
-    p_dc = pm.var[:p_dc]
-    pnode = pm.var[:pnode][i]
+    p = PowerModels.var(pm, :p)
+    p_dc = PowerModels.var(pm, :p_dc)
+    pnode = PowerModels.var(pm, :pnode)[i]
 
     @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - gs*1.0^2)
     # omit reactive constraint

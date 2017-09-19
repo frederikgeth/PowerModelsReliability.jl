@@ -1,6 +1,5 @@
 ""
-function get_solution_tf(pm::GenericPowerModel)
-    sol = PowerModels.init_solution(pm)
+function get_solution_tf(pm::GenericPowerModel, sol::Dict{String,Any})
     PowerModels.add_bus_voltage_setpoint(sol, pm)
     PowerModels.add_generator_power_setpoint(sol, pm)
     PowerModels.add_branch_flow_setpoint(sol, pm)
@@ -37,10 +36,10 @@ function add_branch_tap_setpoint(sol, pm::GenericPowerModel)
         try
             extract_vtap_fr = (var,idx,item) -> var[(idx, item["f_bus"], item["t_bus"])]
             extract_vtap_to = (var,idx,item) -> var[(idx, item["t_bus"], item["f_bus"])]
-            vtap_fr = getvalue(extract_vtap_fr(pm.var[:vm_tap], idx, item))
-            vtap_to = getvalue(extract_vtap_to(pm.var[:vm_tap], idx, item))
-            vf = getvalue(pm.var[:vm])[fbus]
-            vt = getvalue(pm.var[:vm])[tbus]
+            vtap_fr = getvalue(extract_vtap_fr(PowerModels.var(pm, :vm_tap), idx, item))
+            vtap_to = getvalue(extract_vtap_to(PowerModels.var(pm, :vm_tap), idx, item))
+            vf = getvalue(PowerModels.var(pm,:vm))[fbus]
+            vt = getvalue(PowerModels.var(pm,:vm))[tbus]
             sol_item["tapf"] = vf / vtap_fr
             sol_item["tapt"] = vt / vtap_to
         catch
