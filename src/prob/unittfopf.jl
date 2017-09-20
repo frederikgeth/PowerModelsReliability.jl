@@ -27,7 +27,7 @@ function post_unittfopf(pm::GenericPowerModel)
     variable_transformation(pm)
     variable_node_aggregation(pm)
     variable_load(pm)
-    #variable_action_indicator(pm)
+    variable_action_indicator(pm)
     variable_auxiliary_power(pm)
 
     objective_min_redispatch_cost(pm)
@@ -41,15 +41,14 @@ function post_unittfopf(pm::GenericPowerModel)
         constraint_kcl_shunt_aggregated(pm, i)
         contraint_load_gen_aggregation_sheddable(pm, i)
     end
-    print(PowerModels.ids(pm, :load))
-    # for i in PowerModels.ids(pm, :load)
-    #     #constraint_flexible_load(pm, i)
-    #     constraint_redispatch_power_load(pm, i)
-    # end
-    print(PowerModels.ids(pm, :gen))
+
+    for i in PowerModels.ids(pm, :load)
+        constraint_flexible_load(pm, i)
+        constraint_redispatch_power_load(pm, i)
+    end
 
     for i in PowerModels.ids(pm, :gen)
-        #constraint_flexible_gen(pm, i)
+        constraint_flexible_gen(pm, i)
         constraint_redispatch_power_gen(pm, i)
     end
 

@@ -1,6 +1,6 @@
-function variable_transformation(pm::GenericPowerModel; kwargs...)
-    variable_phase_shift(pm; kwargs...)
-    variable_voltage_tap(pm; kwargs...)
+function variable_transformation(pm::GenericPowerModel, n::Int=pm.cnw; kwargs...)
+    variable_phase_shift(pm, n; kwargs...)
+    variable_voltage_tap(pm, n; kwargs...)
 end
 
 "variable: `va_shift[l,i,j]` for `(l,i,j)` in `arcs`"
@@ -118,6 +118,14 @@ function variable_action_indicator(pm::GenericPowerModel, n::Int=pm.cnw; kwargs.
 end
 
 function variable_load_action_indicator(pm::GenericPowerModel, n::Int=pm.cnw)
+    if haskey(pm.setting,"relax_continuous") && pm.setting["relax_continuous"] == true
+        pm.var[:nw][n][:load_ind] = @variable(pm.model,
+            [l in keys(PowerModels.ref(pm, :load))], basename="load_ind",
+            lowerbound = 1,
+            upperbound = 1,
+            start = PowerModels.getstart(PowerModels.ref(pm, :load), l, "void", 0)
+        )
+    else
     pm.var[:nw][n][:load_ind] = @variable(pm.model,
         [l in keys(PowerModels.ref(pm, :load))], basename="load_ind",
         lowerbound = 0,
@@ -125,24 +133,36 @@ function variable_load_action_indicator(pm::GenericPowerModel, n::Int=pm.cnw)
         category = :Int,
         start = PowerModels.getstart(PowerModels.ref(pm, :load), l, "void", 0)
     )
+    end
 end
 
 function variable_gen_action_indicator(pm::GenericPowerModel, n::Int=pm.cnw)
-    pm.var[:nw][n][:gen_ind] = @variable(pm.model,
-        [g in keys(PowerModels.ref(pm, :gen))], basename="gen_ind",
-        lowerbound = 0,
-        upperbound = 1,
-        category = :Int,
-        start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
-    )
+    if haskey(pm.setting,"relax_continuous") && pm.setting["relax_continuous"] == true
+        pm.var[:nw][n][:gen_ind] = @variable(pm.model,
+            [g in keys(PowerModels.ref(pm, :gen))], basename="gen_ind",
+            lowerbound = 1,
+            upperbound = 1,
+            start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
+            )
+    else
+        pm.var[:nw][n][:gen_ind] = @variable(pm.model,
+            [g in keys(PowerModels.ref(pm, :gen))], basename="gen_ind",
+            lowerbound = 0,
+            upperbound = 1,
+            category = :Int,
+            start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
+            )
+    end
 end
 
 function variable_auxiliary_power(pm::GenericPowerModel, n::Int=pm.cnw; kwargs...)
-    variable_auxiliary_power_load(pm, n; kwargs...)
-    variable_auxiliary_power_gen(pm, n; kwargs...)
+    variable_auxiliary_active_power_load(pm, n; kwargs...)
+    variable_auxiliary_reactive_power_load(pm, n; kwargs...)
+    variable_auxiliary_active_power_gen(pm, n; kwargs...)
+    variable_auxiliary_reactive_power_gen(pm, n; kwargs...)
 end
 
-function variable_auxiliary_power_load(pm::GenericPowerModel, n::Int=pm.cnw)
+function variable_auxiliary_active_power_load(pm::GenericPowerModel, n::Int=pm.cnw)
     pm.var[:nw][n][:pl_delta] = @variable(pm.model,
         [l in keys(PowerModels.ref(pm, :load))], basename="pl_delta",
         lowerbound = 0,
@@ -151,11 +171,29 @@ function variable_auxiliary_power_load(pm::GenericPowerModel, n::Int=pm.cnw)
     )
 end
 
-function variable_auxiliary_power_gen(pm::GenericPowerModel, n::Int=pm.cnw)
+function variable_auxiliary_reactive_power_load(pm::GenericPowerModel, n::Int=pm.cnw)
+    pm.var[:nw][n][:ql_delta] = @variable(pm.model,
+        [l in keys(PowerModels.ref(pm, :load))], basename="ql_delta",
+        lowerbound = 0,
+        upperbound = 2 * PowerModels.ref(pm, :load)[l]["qrated"],
+        start = PowerModels.getstart(PowerModels.ref(pm, :load), l, "void", 0)
+    )
+end
+
+function variable_auxiliary_active_power_gen(pm::GenericPowerModel, n::Int=pm.cnw)
     pm.var[:nw][n][:pg_delta] = @variable(pm.model,
         [g in keys(PowerModels.ref(pm, :gen))], basename="pg_delta",
         lowerbound = 0,
         upperbound = 2 * PowerModels.ref(pm, :gen)[g]["prated"],
+        start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
+    )
+end
+
+function variable_auxiliary_reactive_power_gen(pm::GenericPowerModel, n::Int=pm.cnw)
+    pm.var[:nw][n][:qg_delta] = @variable(pm.model,
+        [g in keys(PowerModels.ref(pm, :gen))], basename="qg_delta",
+        lowerbound = 0,
+        upperbound = 2 * PowerModels.ref(pm, :gen)[g]["qrated"],
         start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
     )
 end

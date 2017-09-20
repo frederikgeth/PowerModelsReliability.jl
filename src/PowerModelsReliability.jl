@@ -18,4 +18,5 @@ include("form/acp.jl")
 include("form/dcp.jl")
 include("prob/tfopf.jl")
 include("prob/unittfopf.jl")
+include("prob/scunittfopf.jl")
 end
