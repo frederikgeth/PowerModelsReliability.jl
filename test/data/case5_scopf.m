@@ -79,3 +79,12 @@ mpc.branch_variable_transformer = [
 0   0   0  0 0   0 0 0						0 1 1 1.1 0.9 1 1;
 0	0   0  0 0   0 0 0						  0 1 1 1 1 1 1;
 ];
+
+%column_names% prob branch_id1 branch_id2 branch_id3 gen_id1 gen_id2 gen_id3
+mpc.contingencies = [
+    0.98 0 0 0 0 0 0;
+    0.005 2 0 0 0 0 0;
+    0.01 0 0 0 1 0 0;
+    0.0025 1 0 0 1 0 0;
+    0.0025 3 0 0 1 0 0;
+ ];

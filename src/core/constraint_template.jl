@@ -63,56 +63,56 @@ end
 constraint_kcl_shunt_aggregated(pm::GenericPowerModel, i::Int) = constraint_kcl_shunt_aggregated(pm::GenericPowerModel, pm.cnw, i::Int)
 
 ""
-function contraint_load_gen_aggregation(pm, n::Int, i::Int)
-        contraint_active_load_gen_aggregation(pm, n, i)
-        contraint_reactive_load_gen_aggregation(pm, n, i)
+function constraint_load_gen_aggregation(pm, n::Int, i::Int)
+        constraint_active_load_gen_aggregation(pm, n, i)
+        constraint_reactive_load_gen_aggregation(pm, n, i)
 end
-contraint_load_gen_aggregation(pm::GenericPowerModel, i::Int) = contraint_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_load_gen_aggregation(pm::GenericPowerModel, i::Int) = constraint_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
 
 
-function contraint_active_load_gen_aggregation(pm, n::Int, i::Int)
+function constraint_active_load_gen_aggregation(pm, n::Int, i::Int)
     bus = PowerModels.ref(pm, n, :bus, i)
     bus_gens = PowerModels.ref(pm, n, :bus_gens, i)
 
-    return contraint_active_load_gen_aggregation(pm, n, i, bus_gens, bus["pd"])
+    return constraint_active_load_gen_aggregation(pm, n, i, bus_gens, bus["pd"])
 end
-contraint_active_load_gen_aggregation(pm::GenericPowerModel, i::Int) = contraint_active_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_active_load_gen_aggregation(pm::GenericPowerModel, i::Int) = constraint_active_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
 
 
-function contraint_reactive_load_gen_aggregation(pm, n::Int, i::Int)
+function constraint_reactive_load_gen_aggregation(pm, n::Int, i::Int)
     bus = PowerModels.ref(pm, n, :bus, i)
     bus_gens = PowerModels.ref(pm, n, :bus_gens, i)
 
-    return contraint_reactive_load_gen_aggregation(pm, n, i, bus_gens, bus["qd"])
+    return constraint_reactive_load_gen_aggregation(pm, n, i, bus_gens, bus["qd"])
 end
-contraint_reactive_load_gen_aggregation(pm::GenericPowerModel, i::Int) = contraint_reactive_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_reactive_load_gen_aggregation(pm::GenericPowerModel, i::Int) = constraint_reactive_load_gen_aggregation(pm::GenericPowerModel, pm.cnw, i::Int)
 
 
 ""
-function contraint_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
-    contraint_active_load_gen_aggregation_sheddable(pm, n, i)
-    contraint_reactive_load_gen_aggregation_sheddable(pm, n, i)
+function constraint_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
+    constraint_active_load_gen_aggregation_sheddable(pm, n, i)
+    constraint_reactive_load_gen_aggregation_sheddable(pm, n, i)
 end
-contraint_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = contraint_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = constraint_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
 
-function contraint_active_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
+function constraint_active_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
     bus = PowerModels.ref(pm, n, :bus, i)
     bus_gens = PowerModels.ref(pm, n, :bus_gens, i)
     bus_loads = PowerModels.ref(pm, n, :bus_loads, i)
 
-    return contraint_active_load_gen_aggregation_sheddable(pm, n, i, bus_gens, bus_loads)
+    return constraint_active_load_gen_aggregation_sheddable(pm, n, i, bus_gens, bus_loads)
 end
-contraint_active_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = contraint_active_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_active_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = constraint_active_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
 
 
-function contraint_reactive_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
+function constraint_reactive_load_gen_aggregation_sheddable(pm, n::Int, i::Int)
     bus = PowerModels.ref(pm, n, :bus, i)
     bus_gens = PowerModels.ref(pm, n, :bus_gens, i)
     bus_loads = PowerModels.ref(pm, n, :bus_loads, i)
 
-    return contraint_reactive_load_gen_aggregation_sheddable(pm, n, i, bus_gens, bus_loads)
+    return constraint_reactive_load_gen_aggregation_sheddable(pm, n, i, bus_gens, bus_loads)
 end
-contraint_reactive_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = contraint_reactive_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
+constraint_reactive_load_gen_aggregation_sheddable(pm::GenericPowerModel, i::Int) = constraint_reactive_load_gen_aggregation_sheddable(pm::GenericPowerModel, pm.cnw, i::Int)
 
 ""
 function constraint_flexible_load(pm::GenericPowerModel, n::Int, i::Int)
@@ -156,14 +156,129 @@ constraint_flexible_reactive_gen(pm::GenericPowerModel, i::Int) = constraint_fle
 
 ""
 function constraint_redispatch_power_gen(pm, n::Int, i::Int)
-    gen = PowerModels.ref(pm, n, :gen, i)
-    return constraint_redispatch_power_gen(pm, n, gen["index"], gen["pref"])
+    constraint_redispatch_active_power_gen(pm, n::Int, i::Int)
+    constraint_redispatch_reactive_power_gen(pm, n::Int, i::Int)
 end
 constraint_redispatch_power_gen(pm::GenericPowerModel, i::Int) = constraint_redispatch_power_gen(pm::GenericPowerModel, pm.cnw, i::Int)
 
+function constraint_redispatch_active_power_gen(pm, n::Int, i::Int)
+    gen = PowerModels.ref(pm, n, :gen, i)
+    return constraint_redispatch_active_power_gen(pm, n, gen["index"], gen["pref"])
+end
+constraint_redispatch_active_power_gen(pm::GenericPowerModel, i::Int) = constraint_redispatch_active_power_gen(pm::GenericPowerModel, pm.cnw, i::Int)
 
+function constraint_redispatch_reactive_power_gen(pm, n::Int, i::Int)
+    gen = PowerModels.ref(pm, n, :gen, i)
+    return constraint_redispatch_reactive_power_gen(pm, n, gen["index"], gen["qref"])
+end
+constraint_redispatch_reactive_power_gen(pm::GenericPowerModel, i::Int) = constraint_redispatch_reactive_power_gen(pm::GenericPowerModel, pm.cnw, i::Int)
+""
+function constraint_second_stage_redispatch_power_gen(pm, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_active_power_gen(pm, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_reactive_power_gen(pm, n::Int, i::Int, first_stage_network_id)
+end
+constraint_second_stage_redispatch_power_gen(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_power_gen(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+function constraint_second_stage_redispatch_active_power_gen(pm, n::Int, i::Int, first_stage_network_id)
+    gen = PowerModels.ref(pm, n, :gen, i)
+    return constraint_second_stage_redispatch_active_power_gen(pm, n, gen["index"], first_stage_network_id)
+end
+constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+function constraint_second_stage_redispatch_reactive_power_gen(pm, n::Int, i::Int, first_stage_network_id)
+    gen = PowerModels.ref(pm, n, :gen, i)
+    return constraint_second_stage_redispatch_reactive_power_gen(pm, n, gen["index"], first_stage_network_id)
+end
+constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+""
 function constraint_redispatch_power_load(pm, n::Int, i::Int)
-    load = PowerModels.ref(pm, n, :load, i)
-    return constraint_redispatch_power_load(pm, n, load["index"], load["pref"])
+    constraint_redispatch_active_power_load(pm, n::Int, i::Int)
+    constraint_redispatch_reactive_power_load(pm, n::Int, i::Int)
 end
 constraint_redispatch_power_load(pm::GenericPowerModel, i::Int) = constraint_redispatch_power_load(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_redispatch_active_power_load(pm, n::Int, i::Int)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_redispatch_active_power_load(pm, n, load["index"], load["pref"])
+end
+constraint_redispatch_active_power_load(pm::GenericPowerModel, i::Int) = constraint_redispatch_active_power_load(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_redispatch_reactive_power_load(pm, n::Int, i::Int)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_redispatch_reactive_power_load(pm, n, load["index"], load["qref"])
+end
+constraint_redispatch_reactive_power_load(pm::GenericPowerModel, i::Int) = constraint_redispatch_reactive_power_load(pm::GenericPowerModel, pm.cnw, i::Int)
+""
+function constraint_second_stage_redispatch_power_load(pm, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_active_power_load(pm, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_reactive_power_load(pm, n::Int, i::Int, first_stage_network_id)
+end
+constraint_second_stage_redispatch_power_load(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_power_load(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+function constraint_second_stage_redispatch_active_power_load(pm, n::Int, i::Int, first_stage_network_id)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_second_stage_redispatch_active_power_load(pm, n, load["index"], first_stage_network_id)
+end
+constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+function constraint_second_stage_redispatch_reactive_power_load(pm, n::Int, i::Int, first_stage_network_id)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_second_stage_redispatch_reactive_power_load(pm, n, load["index"], first_stage_network_id)
+end
+constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+""
+function constraint_fixed_load(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_fixed_active_load(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_fixed_reactive_load(pm::GenericPowerModel, n::Int, i::Int)
+end
+constraint_fixed_load(pm::GenericPowerModel, i::Int) = constraint_fixed_load(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_fixed_active_load(pm, n::Int, i::Int)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_fixed_active_load(pm, n, load["index"], load["pref"])
+end
+constraint_fixed_active_load(pm::GenericPowerModel, i::Int) = constraint_fixed_active_load(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_fixed_reactive_load(pm, n::Int, i::Int)
+    load = PowerModels.ref(pm, n, :load, i)
+    return constraint_fixed_reactive_load(pm, n, load["index"], load["qref"])
+end
+constraint_fixed_reactive_load(pm::GenericPowerModel, i::Int) = constraint_fixed_reactive_load(pm::GenericPowerModel, pm.cnw, i::Int)
+
+""
+function constraint_gen_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_active_power_gen_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_reactive_power_gen_contingency(pm::GenericPowerModel, n::Int, i::Int)
+end
+constraint_gen_contingency(pm::GenericPowerModel, i::Int) = constraint_gen_contingency(pm::GenericPowerModel, pm.cnw, i::Int)
+
+""
+function constraint_branch_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_active_power_branch_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    constraint_reactive_power_branch_contingency(pm::GenericPowerModel, n::Int, i::Int)
+end
+constraint_branch_contingency(pm::GenericPowerModel, i::Int) = constraint_branch_contingency(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_active_power_branch_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    branch = PowerModels.ref(pm, n, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    t_idx = (i, t_bus, f_bus)
+
+    return constraint_active_power_branch_contingency(pm, n, branch["index"], f_idx, t_idx)
+end
+constraint_active_power_branch_contingency(pm::GenericPowerModel, i::Int) = constraint_active_power_branch_contingency(pm::GenericPowerModel, pm.cnw, i::Int)
+
+function constraint_reactive_power_branch_contingency(pm::GenericPowerModel, n::Int, i::Int)
+    branch = PowerModels.ref(pm, n, :branch, i)
+    f_bus = branch["f_bus"]
+    t_bus = branch["t_bus"]
+    f_idx = (i, f_bus, t_bus)
+    t_idx = (i, t_bus, f_bus)
+
+    return constraint_reactive_power_branch_contingency(pm, n, branch["index"], f_idx, t_idx)
+end
+constraint_reactive_power_branch_contingency(pm::GenericPowerModel, i::Int) = constraint_reactive_power_branch_contingency(pm::GenericPowerModel, pm.cnw, i::Int)

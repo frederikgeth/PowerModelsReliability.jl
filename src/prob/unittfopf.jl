@@ -39,7 +39,7 @@ function post_unittfopf(pm::GenericPowerModel)
 
     for i in PowerModels.ids(pm, :bus)
         constraint_kcl_shunt_aggregated(pm, i)
-        contraint_load_gen_aggregation_sheddable(pm, i)
+        constraint_load_gen_aggregation_sheddable(pm, i)
     end
 
     for i in PowerModels.ids(pm, :load)

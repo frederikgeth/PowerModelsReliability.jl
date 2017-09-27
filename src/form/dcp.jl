@@ -34,18 +34,38 @@ function constraint_kcl_shunt_aggregated{T <: PowerModels.AbstractDCPForm}(pm::G
 end
 
 
-function constraint_flexible_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, gen)
-        constraint_flexible_active_gen(pm, n, gen)
+function constraint_flexible_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+        constraint_flexible_active_gen(pm, n, i)
 end
 
-function constraint_flexible_load{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, load)
-        constraint_flexible_active_gen(pm, n, load)
+function constraint_flexible_load{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+        constraint_flexible_active_load(pm, n, i)
 end
 
-function contraint_load_gen_aggregation_sheddable{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, bus)
-    contraint_active_load_gen_aggregation_sheddable(pm, n, bus)
+function constraint_fixed_load{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+        constraint_fixed_active_load(pm, n, i)
 end
 
-function contraint_load_gen_aggregation{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, bus)
-        contraint_active_load_gen_aggregation(pm, n, bus)
+function constraint_load_gen_aggregation_sheddable{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+    constraint_active_load_gen_aggregation_sheddable(pm, n, i)
+end
+
+function constraint_load_gen_aggregation{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+        constraint_active_load_gen_aggregation(pm, n, i)
+end
+
+function constraint_redispatch_power_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+        constraint_redispatch_active_power_gen(pm, n, i)
+end
+
+function constraint_gen_contingency{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+    constraint_active_power_gen_contingency(pm, n, i)
+end
+
+function constraint_branch_contingency{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int)
+    constraint_active_power_branch_contingency(pm, n, i)
+end
+
+function constraint_second_stage_redispatch_power_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_active_power_gen(pm, n, i, first_stage_network_id)
 end
