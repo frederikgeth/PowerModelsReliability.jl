@@ -19,6 +19,8 @@ end
 
 ""
 function post_scunittfopf(pm::GenericPowerModel)
+    variable_risk(pm)
+    variable_dispatch_cost(pm)
     first_stage_network_id = 1;
     second_stage_network_ids = Dict();
     for (n, network) in pm.ref[:nw]
@@ -34,11 +36,13 @@ end
 function first_stage_model(pm::GenericPowerModel, first_stage_network_id)
     n = first_stage_network_id;
     add_load_model!(pm, n) # To add load data
+    add_power_factor!(pm, n) # To add load data
     PowerModels.variable_voltage(pm, n)
     PowerModels.variable_generation(pm, n)
     PowerModels.variable_line_flow(pm, n)
     PowerModels.variable_dcline_flow(pm, n)
     variable_transformation(pm, n)
+    #variable_dispatch_cost(pm, n)
     variable_node_aggregation(pm, n)
     variable_load(pm, n)
     variable_action_indicator(pm, n)
@@ -87,11 +91,13 @@ end
 function second_stage_model(pm::GenericPowerModel, first_stage_network_id, second_stage_network_ids)
     for (n, contingency) in second_stage_network_ids
         add_load_model!(pm, n) # To add load data
+        add_power_factor!(pm, n) # To add load data
         PowerModels.variable_voltage(pm, n)
         PowerModels.variable_generation(pm, n)
         PowerModels.variable_line_flow(pm, n)
         PowerModels.variable_dcline_flow(pm, n)
         variable_transformation(pm, n)
+        #variable_dispatch_cost(pm, n)
         variable_node_aggregation(pm, n)
         variable_load(pm, n)
         variable_action_indicator(pm, n)

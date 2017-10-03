@@ -4,6 +4,7 @@ function get_solution_tf(pm::GenericPowerModel, sol::Dict{String,Any})
     PowerModels.add_generator_power_setpoint(sol, pm)
     PowerModels.add_branch_flow_setpoint(sol, pm)
     PowerModels.add_dcline_flow_setpoint(sol, pm)
+    add_risk(sol, pm)
     add_branch_shift_setpoint(sol, pm)
     add_branch_tap_setpoint(sol, pm)
     add_load_power_setpoint(sol, pm)
@@ -98,4 +99,29 @@ function add_qdelta(sol, pm::GenericPowerModel)
     mva_base = pm.data["baseMVA"]
     PowerModels.add_setpoint(sol, pm, "load", "qdelta", :ql_delta)
     PowerModels.add_setpoint(sol, pm, "gen", "qdelta", :qg_delta)
+end
+
+""
+function add_risk(sol, pm::GenericPowerModel)
+  add_case_level_setpoint(sol, pm, "first_stage_cost", :first_stage_cost)
+  add_case_level_setpoint(sol, pm, "second_stage_risk", :second_stage_risk)
+  add_nw_level_setpoint(sol, pm, "dispatch_cost", :dispatch_cost)
+end
+
+
+function add_case_level_setpoint(sol, pm::GenericPowerModel, param_name, variable_symbol; scale = (x) -> x, extract_var = var -> var)
+        try
+            variable = extract_var(pm.var[variable_symbol])
+            sol[param_name] = scale(getvalue(variable))
+        catch
+        end
+end
+
+
+function add_nw_level_setpoint(sol, pm::GenericPowerModel, param_name, variable_symbol; scale = (x) -> x, extract_var = var -> var)
+        try
+                variable = extract_var(pm.var[variable_symbol][pm.cnw])
+                sol[param_name] = scale(getvalue(variable))
+        catch
+        end
 end

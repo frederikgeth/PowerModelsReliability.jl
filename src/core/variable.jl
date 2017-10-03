@@ -197,3 +197,32 @@ function variable_auxiliary_reactive_power_gen(pm::GenericPowerModel, n::Int=pm.
         start = PowerModels.getstart(PowerModels.ref(pm, :gen), g, "void", 0)
     )
 end
+
+function variable_risk(pm::GenericPowerModel; kwargs...)
+    variable_first_stage_cost(pm; kwargs...)
+    variable_second_stage_risk(pm; kwargs...)
+end
+
+function variable_first_stage_cost(pm::GenericPowerModel)
+    pm.var[:first_stage_cost] = @variable(pm.model,
+        basename="first_stage_cost",
+        lowerbound = 0,
+        upperbound = Inf,
+        start = 0)
+end
+
+function variable_second_stage_risk(pm::GenericPowerModel)
+    pm.var[:second_stage_risk] = @variable(pm.model,
+        basename="second_stage_risk",
+        lowerbound = 0,
+        upperbound = Inf,
+        start = 0)
+end
+
+function variable_dispatch_cost(pm::GenericPowerModel)
+    pm.var[:dispatch_cost] = @variable(pm.model, [n in keys(pm.ref[:nw])],
+        basename="dispatch_cost",
+        lowerbound = 0,
+        upperbound = Inf,
+        start = 0)
+end

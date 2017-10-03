@@ -213,6 +213,7 @@ constraint_redispatch_reactive_power_load(pm::GenericPowerModel, i::Int) = const
 function constraint_second_stage_redispatch_power_load(pm, n::Int, i::Int, first_stage_network_id)
     constraint_second_stage_redispatch_active_power_load(pm, n::Int, i::Int, first_stage_network_id)
     constraint_second_stage_redispatch_reactive_power_load(pm, n::Int, i::Int, first_stage_network_id)
+    constraint_tan_phi_load(pm, n::Int, i::Int)
 end
 constraint_second_stage_redispatch_power_load(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_power_load(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
 
@@ -227,6 +228,12 @@ function constraint_second_stage_redispatch_reactive_power_load(pm, n::Int, i::I
     return constraint_second_stage_redispatch_reactive_power_load(pm, n, load["index"], first_stage_network_id)
 end
 constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel, i::Int, first_stage_network_id) = constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel, pm.cnw, i::Int, first_stage_network_id)
+
+function constraint_tan_phi_load(pm, n::Int, i::Int)
+    load_angle = PowerModels.ref(pm, n, :load_angle, i)[1]
+    return constraint_tan_phi_load(pm, n, i, load_angle)
+end
+constraint_tan_phi_load(pm::GenericPowerModel, i::Int) = constraint_tan_phi_load(pm::GenericPowerModel, pm.cnw, i::Int)
 
 ""
 function constraint_fixed_load(pm::GenericPowerModel, n::Int, i::Int)

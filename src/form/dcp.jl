@@ -69,3 +69,7 @@ end
 function constraint_second_stage_redispatch_power_gen{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int, first_stage_network_id)
     constraint_second_stage_redispatch_active_power_gen(pm, n, i, first_stage_network_id)
 end
+
+function constraint_second_stage_redispatch_power_load{T <: PowerModels.AbstractDCPForm}(pm::GenericPowerModel{T}, n::Int, i::Int, first_stage_network_id)
+    constraint_second_stage_redispatch_active_power_load(pm, n, i, first_stage_network_id)
+end

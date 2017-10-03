@@ -145,6 +145,16 @@ function constraint_second_stage_redispatch_reactive_power_load(pm::GenericPower
     @constraint(pm.model, ql_delta >= -(ql - ql_first_stage))
 end
 
+"""
+Q = P * tan(load_angle): To avoid division by 0: Q*cos(load_angle) = P*sin(load_angle)
+"""
+function constraint_tan_phi_load(pm::GenericPowerModel, n::Int, i::Int, load_angle)
+    ql = PowerModels.var(pm, n, :ql)[i]
+    pl = PowerModels.var(pm, n, :pl)[i]
+
+    @constraint(pm.model, ql * cos(load_angle) == pl * sin(load_angle))
+end
+
 ""
 function constraint_active_power_gen_contingency(pm::GenericPowerModel, n::Int, i::Int)
     pg_delta = PowerModels.var(pm, n, :pg_delta)[i]
