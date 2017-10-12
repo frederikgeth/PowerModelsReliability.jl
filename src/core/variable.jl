@@ -226,3 +226,19 @@ function variable_dispatch_cost(pm::GenericPowerModel)
         upperbound = Inf,
         start = 0)
 end
+
+function variable_redispatch_cost(pm::GenericPowerModel)
+    pm.var[:redispatch_cost] = @variable(pm.model, [n in keys(pm.ref[:nw])],
+        basename="redispatch_cost",
+        lowerbound = 0,
+        upperbound = Inf,
+        start = 0)
+end
+
+function variable_loadshedding_cost(pm::GenericPowerModel)
+    pm.var[:loadshedding_cost] = @variable(pm.model, [n in keys(pm.ref[:nw])],
+        basename="loadshedding_cost",
+        lowerbound = 0,
+        upperbound = Inf,
+        start = 0)
+end

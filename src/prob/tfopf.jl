@@ -26,29 +26,30 @@ function post_tfopf(pm::GenericPowerModel)
     PowerModels.objective_min_fuel_cost(pm)
 
     PowerModels.constraint_voltage(pm)
-    for (i,bus) in pm.ref[:ref_buses]
-        PowerModels.constraint_theta_ref(pm, bus)
+    for i in PowerModels.ids(pm, :ref_buses)
+        PowerModels.constraint_theta_ref(pm, i)
     end
 
-    for (i,bus) in pm.ref[:bus]
-        PowerModels.constraint_kcl_shunt(pm, bus)
+    for i in PowerModels.ids(pm, :bus)
+        PowerModels.constraint_kcl_shunt(pm, i)
     end
 
-    for (i,branch) in pm.ref[:branch]
+    for i in PowerModels.ids(pm, :branch)
+        branch = PowerModels.ref(pm, :branch, i)
         if branch["shiftable"] == false && branch["tappable"] == false
-            PowerModels.constraint_ohms_yt_from(pm, branch)
-            PowerModels.constraint_ohms_yt_to(pm, branch)
-            constraint_link_voltage_magnitudes(pm, branch)
+            PowerModels.constraint_ohms_yt_from(pm, i)
+            PowerModels.constraint_ohms_yt_to(pm, i)
+            constraint_link_voltage_magnitudes(pm, i)
         else
-            constraint_variable_transformer_y_from(pm, branch)
-            constraint_variable_transformer_y_to(pm, branch)
+            constraint_variable_transformer_y_from(pm, i)
+            constraint_variable_transformer_y_to(pm, i)
         end
-        PowerModels.constraint_voltage_angle_difference(pm, branch)
+        PowerModels.constraint_voltage_angle_difference(pm, i)
 
-        PowerModels.constraint_thermal_limit_from(pm, branch)
-        PowerModels.constraint_thermal_limit_to(pm, branch)
+        PowerModels.constraint_thermal_limit_from(pm, i)
+        PowerModels.constraint_thermal_limit_to(pm, i)
     end
-    for (i,dcline) in pm.ref[:dcline]
-        PowerModels.constraint_dcline(pm, dcline)
+    for i in PowerModels.ids(pm, :dcline)
+        PowerModels.constraint_dcline(pm, i)
     end
 end

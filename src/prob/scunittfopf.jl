@@ -21,6 +21,8 @@ end
 function post_scunittfopf(pm::GenericPowerModel)
     variable_risk(pm)
     variable_dispatch_cost(pm)
+    variable_redispatch_cost(pm)
+    variable_loadshedding_cost(pm)
     first_stage_network_id = 1;
     second_stage_network_ids = Dict();
     for (n, network) in pm.ref[:nw]
