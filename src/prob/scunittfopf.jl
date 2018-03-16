@@ -41,7 +41,7 @@ function first_stage_model(pm::GenericPowerModel, first_stage_network_id)
     add_power_factor!(pm, n) # To add load data
     PowerModels.variable_voltage(pm, n)
     PowerModels.variable_generation(pm, n)
-    PowerModels.variable_line_flow(pm, n)
+    PowerModels.variable_branch_flow(pm, n)
     PowerModels.variable_dcline_flow(pm, n)
     variable_transformation(pm, n)
     #variable_dispatch_cost(pm, n)
@@ -96,7 +96,7 @@ function second_stage_model(pm::GenericPowerModel, first_stage_network_id, secon
         add_power_factor!(pm, n) # To add load data
         PowerModels.variable_voltage(pm, n)
         PowerModels.variable_generation(pm, n)
-        PowerModels.variable_line_flow(pm, n)
+        PowerModels.variable_branch_flow(pm, n)
         PowerModels.variable_dcline_flow(pm, n)
         variable_transformation(pm, n)
         #variable_dispatch_cost(pm, n)

@@ -1,14 +1,15 @@
 using PowerModelsReliability
 using PowerModels
 using Ipopt
-using Mosek
+#using Mosek
 
-mosek = MosekSolver()
+#mosek = MosekSolver()
 ipopt = IpoptSolver()
 
 function build_mn_data(base_data)
     mp_data = PowerModels.parse_file(base_data)
-    return PowerModels.replicate(mp_data, 2)
+    n_cont = length(mp_data["contingencies"])
+    return PowerModels.replicate(mp_data, n_cont)
 end
 
 function build_mn_data(base_data_1, base_data_2)
@@ -39,8 +40,8 @@ function build_mn_data(base_data_1, base_data_2)
     return mn_data
 end
 
-data = build_mn_data("C:/Users/hergun/.julia/v0.6/PowerModelsReliability/test/data/case5_tf.m")
-
+data = build_mn_data("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf_load.m")
+base_data = PowerModels.parse_file("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf.m")
 display(data)
 a = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("line_flows" => true),"relax_continuous" => true))
 display(a)
