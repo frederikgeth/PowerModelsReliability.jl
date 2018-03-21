@@ -19,7 +19,7 @@ end
 function post_tfopf(pm::GenericPowerModel)
     PowerModels.variable_voltage(pm)
     PowerModels.variable_generation(pm)
-    PowerModels.variable_line_flow(pm)
+    PowerModels.variable_branch_flow(pm) #d
     PowerModels.variable_dcline_flow(pm)
     variable_transformation(pm)
 

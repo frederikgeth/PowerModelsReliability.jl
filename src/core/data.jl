@@ -1,4 +1,4 @@
-function process_additional_data(data)
+function process_additional_data!(data)
   mva_base = data["baseMVA"]
   rescale = x -> x/mva_base
   rescale_cost = x -> mva_base * x

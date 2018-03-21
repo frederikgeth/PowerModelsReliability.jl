@@ -6,9 +6,11 @@ Building upon  PowerModels, the code is engineered to decouple problem specifica
 **Core Problem Specifications**
 * Optimal Power Flow with Phase Shifting Transformers and On-line Tap Changing Transformers (tfopf)
 * Optimal Power Flow with Phase Shifting Transformers and On-line Tap Changing Transformers and Load Shedding (unittfopf)
+* Security-Constrained Optimal Power Flow with Phase Shifting Transformers and On-line Tap Changing Transformers and Load Shedding (scunittfopf)
+
 
 **Core Network Formulations**
-* See PowerModels
+* See PowerModels documentation
 
 **Network Data Formats**
 * Matpower ".m" files

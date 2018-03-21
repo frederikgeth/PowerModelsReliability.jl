@@ -1,18 +1,18 @@
 export run_scunittfopf, run_ac_scunittfopf, run_dc_scunittfopf
 
 ""
-function run_ac_scunittfopf(data, solver; kwargs...)
+function run_ac_scunittfopf(data::Dict{String,Any}, solver; kwargs...)
     return run_scunittfopf(data, ACPPowerModel, solver; kwargs...)
 end
 
 ""
-function run_dc_scunittfopf(data, solver; kwargs...)
+function run_dc_scunittfopf(data::Dict{String,Any}, solver; kwargs...)
     return run_scunittfopf(data, DCPPowerModel, solver; kwargs...)
 end
 
 ""
-function run_scunittfopf(data, model_constructor, solver; kwargs...)
-    process_additional_data(data)
+function run_scunittfopf(data::Dict{String,Any}, model_constructor, solver; kwargs...)
+    process_additional_data!(data)
     pm = PowerModels.build_generic_model(data, model_constructor, post_scunittfopf; kwargs...)
     return PowerModels.solve_generic_model(pm, solver; solution_builder = get_solution_tf)
 end

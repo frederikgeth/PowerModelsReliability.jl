@@ -1,18 +1,18 @@
 export run_unittfopf, run_ac_unittfopf, run_dc_unittfopf
 
 ""
-function run_ac_unittfopf(data, solver; kwargs...)
+function run_ac_unittfopf(data::Dict{String,Any}, solver; kwargs...)
     return run_unittfopf(data, ACPPowerModel, solver; kwargs...)
 end
 
 ""
-function run_dc_unittfopf(data, solver; kwargs...)
+function run_dc_unittfopf(data::Dict{String,Any}, solver; kwargs...)
     return run_unittfopf(data, DCPPowerModel, solver; kwargs...)
 end
 
 ""
-function run_unittfopf(data, model_constructor, solver; kwargs...)
-    process_additional_data(data)
+function run_unittfopf(data::Dict{String,Any}, model_constructor, solver; kwargs...)
+    process_additional_data!(data)
     pm = PowerModels.build_generic_model(data, model_constructor, post_unittfopf; kwargs...)
     return PowerModels.solve_generic_model(pm, solver; solution_builder = get_solution_tf)
 end
@@ -22,7 +22,7 @@ function post_unittfopf(pm::GenericPowerModel)
     add_load_model!(pm) # To add load data
     PowerModels.variable_voltage(pm)
     PowerModels.variable_generation(pm)
-    PowerModels.variable_line_flow(pm)
+    PowerModels.variable_branch_flow(pm)
     PowerModels.variable_dcline_flow(pm)
     variable_transformation(pm)
     variable_node_aggregation(pm)

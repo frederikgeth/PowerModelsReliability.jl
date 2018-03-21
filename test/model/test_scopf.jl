@@ -40,8 +40,9 @@ function build_mn_data(base_data_1, base_data_2)
     return mn_data
 end
 
-data = build_mn_data("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf_load.m")
-base_data = PowerModels.parse_file("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf.m")
+#data = build_mn_data("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf_load.m")
+data = build_mn_data("./test/data/case5_scopf_load.m")
+base_data = PowerModels.parse_file("./test/data/case5_scopf.m")
 display(data)
-a = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("line_flows" => true),"relax_continuous" => true))
+a = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
 display(a)
