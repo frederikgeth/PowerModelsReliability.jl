@@ -23,3 +23,10 @@ makedocs(
         ],
     ]
 )
+deploydocs(
+    deps = nothing,
+    make = nothing,
+    target = "build",
+    repo = "github.com/frederikgeth/PowerModelsReliability.jl.git",
+    julia = "0.6"
+)
