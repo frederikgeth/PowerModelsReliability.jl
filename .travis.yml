@@ -1,0 +1,24 @@
+language: julia
+
+os:
+  - linux
+  - osx
+
+julia:
+  - 0.6
+
+notifications:
+  email: false
+  
+before_install:
+  - julia -e 'if "PowerModelsReliability" in keys(Pkg.installed()) Pkg.rm("PowerModelsReliability"); Pkg.rm("PowerModelsReliability") end'
+  - julia -e 'Pkg.update()' #make sure we get the latest version of METADATA
+  - julia -e 'if !("Documenter" in keys(Pkg.installed())) Pkg.add("Documenter") end'  
+
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd())'
+#  - julia -e 'Pkg.test("PowerModelsReliability")
+
+after_success:
+ - julia -e 'cd(Pkg.dir("PowerModelsReliability")); include(joinpath("docs", "make.jl"))'

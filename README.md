@@ -1,6 +1,6 @@
 # PowerModelsReliability.jl
 
-PowerModelsReliability.jl is a Julia/JuMP/PowerModels package with extensions for reliability management.
+PowerModelsReliability.jl is a Julia/JuMP/PowerModels package with extensions for reliability management based on security-constrained OPF.
 Building upon  PowerModels, the code is engineered to decouple problem specifications (e.g. Power Flow, Optimal Power Flow, ...) from the power network formulations (e.g. AC, DC-approximation, SOC-relaxation, ...).
 
 **Core Problem Specifications**
