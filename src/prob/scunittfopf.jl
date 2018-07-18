@@ -39,54 +39,54 @@ function first_stage_model(pm::GenericPowerModel, first_stage_network_id)
     n = first_stage_network_id;
     add_load_model!(pm, n) # To add load data
     add_power_factor!(pm, n) # To add load data
-    PowerModels.variable_voltage(pm, n)
-    PowerModels.variable_generation(pm, n)
-    PowerModels.variable_branch_flow(pm, n)
-    PowerModels.variable_dcline_flow(pm, n)
-    variable_transformation(pm, n)
+    PowerModels.variable_voltage(pm; nw = n)
+    PowerModels.variable_generation(pm;  nw = n)
+    PowerModels.variable_branch_flow(pm;  nw = n)
+    PowerModels.variable_dcline_flow(pm;  nw = n)
+    variable_transformation(pm;  nw = n)
     #variable_dispatch_cost(pm, n)
-    variable_node_aggregation(pm, n)
-    variable_load(pm, n)
-    variable_action_indicator(pm, n)
-    variable_auxiliary_power(pm, n)
+    variable_node_aggregation(pm;  nw = n)
+    variable_load(pm;  nw = n)
+    variable_action_indicator(pm;  nw = n)
+    variable_auxiliary_power(pm;  nw = n)
 
-    PowerModels.constraint_voltage(pm, n)
+    PowerModels.constraint_voltage(pm;  nw = n)
     for i in PowerModels.ids(pm, n, :ref_buses)
-        PowerModels.constraint_theta_ref(pm, n, i)
+        PowerModels.constraint_theta_ref(pm, i;  nw = n)
     end
 
     for i in PowerModels.ids(pm, n, :bus)
-        constraint_kcl_shunt_aggregated(pm, n, i)
-        constraint_load_gen_aggregation_sheddable(pm, n, i)
+        constraint_kcl_shunt_aggregated(pm, i;  nw = n)
+        constraint_load_gen_aggregation_sheddable(pm, i; nw = n)
     end
 
     for i in PowerModels.ids(pm, n, :load)
-        constraint_fixed_load(pm, n, i)
+        constraint_fixed_load(pm, i; nw = n)
     end
 
     for i in PowerModels.ids(pm, n, :gen)
-        constraint_flexible_gen(pm, n, i)
-        constraint_redispatch_power_gen(pm, n, i)
+        constraint_flexible_gen(pm, i; nw = n)
+        constraint_redispatch_power_gen(pm, i; nw = n)
     end
 
     for i in PowerModels.ids(pm, n, :branch)
         branch = PowerModels.ref(pm, n, :branch, i)
 
         if branch["shiftable"] == false && branch["tappable"] == false
-            PowerModels.constraint_ohms_yt_from(pm, n, i)
-            PowerModels.constraint_ohms_yt_to(pm, n, i)
-            constraint_link_voltage_magnitudes(pm, n, i)
+            PowerModels.constraint_ohms_yt_from(pm, i; nw = n)
+            PowerModels.constraint_ohms_yt_to(pm, i; nw = n)
+            constraint_link_voltage_magnitudes(pm, i; nw = n )
         else
-            constraint_variable_transformer_y_from(pm, n, i)
-            constraint_variable_transformer_y_to(pm, n, i)
+            constraint_variable_transformer_y_from(pm, i; nw = n)
+            constraint_variable_transformer_y_to(pm, i; nw = n)
         end
-        PowerModels.constraint_voltage_angle_difference(pm, n, i)
+        PowerModels.constraint_voltage_angle_difference(pm, i; nw = n)
 
-        PowerModels.constraint_thermal_limit_from(pm, n, i)
-        PowerModels.constraint_thermal_limit_to(pm, n, i)
+        PowerModels.constraint_thermal_limit_from(pm, i; nw = n)
+        PowerModels.constraint_thermal_limit_to(pm, i; nw = n)
     end
     for i in PowerModels.ids(pm, n, :dcline)
-        PowerModels.constraint_dcline(pm, n, i)
+        PowerModels.constraint_dcline(pm, i; nw = n)
     end
 end
 
@@ -94,29 +94,29 @@ function second_stage_model(pm::GenericPowerModel, first_stage_network_id, secon
     for (n, contingency) in second_stage_network_ids
         add_load_model!(pm, n) # To add load data
         add_power_factor!(pm, n) # To add load data
-        PowerModels.variable_voltage(pm, n)
-        PowerModels.variable_generation(pm, n)
-        PowerModels.variable_branch_flow(pm, n)
-        PowerModels.variable_dcline_flow(pm, n)
-        variable_transformation(pm, n)
+        PowerModels.variable_voltage(pm; nw = n)
+        PowerModels.variable_generation(pm; nw = n)
+        PowerModels.variable_branch_flow(pm; nw = n)
+        PowerModels.variable_dcline_flow(pm; nw = n)
+        variable_transformation(pm; nw = n)
         #variable_dispatch_cost(pm, n)
-        variable_node_aggregation(pm, n)
-        variable_load(pm, n)
-        variable_action_indicator(pm, n)
-        variable_auxiliary_power(pm, n)
+        variable_node_aggregation(pm; nw = n)
+        variable_load(pm; nw = n)
+        variable_action_indicator(pm; nw = n)
+        variable_auxiliary_power(pm; nw = n)
 
-        PowerModels.constraint_voltage(pm, n)
+        PowerModels.constraint_voltage(pm; nw = n)
         for i in PowerModels.ids(pm, n, :ref_buses)
-            PowerModels.constraint_theta_ref(pm, n, i)
+            PowerModels.constraint_theta_ref(pm, i; nw = n)
         end
 
         for i in PowerModels.ids(pm, n, :bus)
-            constraint_kcl_shunt_aggregated(pm, n, i)
-            constraint_load_gen_aggregation_sheddable(pm, n, i)
+            constraint_kcl_shunt_aggregated(pm, i;  nw = n)
+            constraint_load_gen_aggregation_sheddable(pm, i;  nw = n)
         end
 
         for i in PowerModels.ids(pm, n, :load)
-            constraint_flexible_load(pm, n, i)
+            constraint_flexible_load(pm, i;  nw = n)
             constraint_second_stage_redispatch_power_load(pm, n, i, first_stage_network_id)
         end
 
@@ -126,7 +126,7 @@ function second_stage_model(pm::GenericPowerModel, first_stage_network_id, secon
             if contingencies[contingency_id]["gen_id1"] == i || contingencies[contingency_id]["gen_id2"] == i || contingencies[contingency_id]["gen_id3"] == i
                 constraint_gen_contingency(pm, n, i)
             else
-                constraint_flexible_gen(pm, n, i)
+                constraint_flexible_gen(pm, i;  nw = n)
                 constraint_second_stage_redispatch_power_gen(pm, n, i, first_stage_network_id)
             end
         end
@@ -137,25 +137,25 @@ function second_stage_model(pm::GenericPowerModel, first_stage_network_id, secon
                 if contingencies[contingency_id]["branch_id1"] == i || contingencies[contingency_id]["branch_id2"] == i || contingencies[contingency_id]["branch_id3"] == i
                     constraint_branch_contingency(pm, n, i)
                 else
-                    PowerModels.constraint_ohms_yt_from(pm, n, i)
-                    PowerModels.constraint_ohms_yt_to(pm, n, i)
-                    constraint_link_voltage_magnitudes(pm, n, i)
+                    PowerModels.constraint_ohms_yt_from(pm, i; nw = n)
+                    PowerModels.constraint_ohms_yt_to(pm, i; nw = n)
+                    constraint_link_voltage_magnitudes(pm, i; nw = n)
                 end
             else
                 if contingencies[contingency_id]["branch_id1"] == i || contingencies[contingency_id]["branch_id2"] == i || contingencies[contingency_id]["branch_id3"] == i
                     constraint_branch_contingency(pm, n, i)
                 else
-                    constraint_variable_transformer_y_from(pm, n, i)
-                    constraint_variable_transformer_y_to(pm, n, i)
+                    constraint_variable_transformer_y_from(pm, i, nw = n)
+                    constraint_variable_transformer_y_to(pm, i, nw = n)
                 end
             end
-            PowerModels.constraint_voltage_angle_difference(pm, n, i)
+            PowerModels.constraint_voltage_angle_difference(pm, i; nw = n)
 
-            PowerModels.constraint_thermal_limit_from(pm, n, i)
-            PowerModels.constraint_thermal_limit_to(pm, n, i)
+            PowerModels.constraint_thermal_limit_from(pm, i; nw = n)
+            PowerModels.constraint_thermal_limit_to(pm, i; nw = n)
         end
         for i in PowerModels.ids(pm, n, :dcline)
-            PowerModels.constraint_dcline(pm, n, i)
+            PowerModels.constraint_dcline(pm, i; nw = n)
         end
     end
 end

@@ -1,15 +1,21 @@
 using PowerModelsReliability
 using PowerModels
+using InfrastructureModels
 using Ipopt
-#using Mosek
+using Mosek
+using Juniper
+using Cbc
+using CPLEX
 
-#mosek = MosekSolver()
+mosek = MosekSolver()
 ipopt = IpoptSolver()
+juniper = JuniperSolver(IpoptSolver(print_level=0); mip_solver=CplexSolver())
 
 function build_mn_data(base_data)
     mp_data = PowerModels.parse_file(base_data)
+    mp_data["load"] = mp_data["sc_load"]
     n_cont = length(mp_data["contingencies"])
-    return PowerModels.replicate(mp_data, n_cont)
+    return InfrastructureModels.replicate(mp_data, n_cont)
 end
 
 function build_mn_data(base_data_1, base_data_2)
@@ -40,9 +46,18 @@ function build_mn_data(base_data_1, base_data_2)
     return mn_data
 end
 
-#data = build_mn_data("C:/Users/eheylen/.julia/v0.6/PowerModelsReliability/test/data/case5_scopf_load.m")
-data = build_mn_data("./test/data/case5_scopf_load.m")
-base_data = PowerModels.parse_file("./test/data/case5_scopf.m")
-display(data)
-a = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
-display(a)
+data = build_mn_data("./test/data/case5_scopf.m")
+resultAC_rc = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
+data = build_mn_data("./test/data/case5_scopf.m")
+resultAC = run_scunittfopf(data, ACPPowerModel, juniper; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false))
+data = build_mn_data("./test/data/case5_scopf.m")
+resultDC_rc = run_scunittfopf(data, DCPPowerModel, mosek; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
+data = build_mn_data("./test/data/case5_scopf.m")
+resultDC = run_scunittfopf(data, DCPPowerModel, mosek; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false))
+
+#TODO
+# Fixes to make everything compatible
+# Extend data model with HVDC contingencies (Branch + Converter)
+# Extend load shedding model to possible DC loads
+# Start addig contingency constraints for the DC branches and converter models (first check on paper for issues such voltage etc, get inspiration from transformer model)
+#

@@ -40,7 +40,7 @@ mpc.gen_rated = [
 
 %% load data
 %column_names%	load_bus	pref	qref status	qmax	qmin pmax	pmin prated qrated voll load_idx
-mpc.load = [
+mpc.sc_load = [
 	1	 0.0     0.0    1	 0       0	 	 0       0.0    0.0  0.0    5000.0 1;
 	2	 150.0     49.0  1	 49.0	 0	 	 150.0	 0.0    150.0  49.0  5000.0 2;
 	2	 150.0     49.0  1	 49.0	 0	 	 150.0	 0.0    150.0  49.0  10000.0 3;
