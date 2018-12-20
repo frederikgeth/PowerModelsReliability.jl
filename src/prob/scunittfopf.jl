@@ -27,7 +27,7 @@ function post_scunittfopf(pm::GenericPowerModel)
     second_stage_network_ids = Dict();
     for (n, network) in pm.ref[:nw]
         if n != 1
-            push!(second_stage_network_ids, n => n-1);
+            push!(second_stage_network_ids, n => n);
         end
     end
     first_stage_model(pm, first_stage_network_id)
