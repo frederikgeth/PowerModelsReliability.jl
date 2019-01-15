@@ -90,3 +90,34 @@ function constraint_kcl_shunt_aggregated(pm::GenericPowerModel{T}, n::Int, cnd::
     @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - sum(gs for gs in values(bus_gs))*vm^2)
     @constraint(pm.model, sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode + sum(bs for bs in values(bus_bs))*vm^2)
 end
+
+
+function constraint_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, pref::AbstractFloat) where T <: PowerModels.AbstractACPForm
+    pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
+    pg = PowerModels.var(pm, n, cnd, :pg, i)
+
+    @NLconstraint(pm.model, pg_delta == abs(pg - pref))
+end
+
+function constraint_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int,  cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractACPForm
+    qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
+    qg = PowerModels.var(pm, n, cnd, :qg, i)
+
+    @NLconstraint(pm.model, qg_delta == abs(qg - qref))
+end
+
+function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
+    pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
+    pg = PowerModels.var(pm, n, cnd, :pg, i)
+    pg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pg, i)
+
+    @NLconstraint(pm.model, pg_delta == abs(pg - pg_first_stage))
+end
+
+function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
+    qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
+    qg = PowerModels.var(pm, n, cnd, :qg, i)
+    qg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :qg, i)
+
+    @NLconstraint(pm.model, qg_delta == abs(qg - qg_first_stage))
+end

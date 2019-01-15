@@ -116,22 +116,6 @@ end
 #
 #     @constraint(pm.model,   qg_delta <= 2 * qrated * gen_ind)
 # end
-""
-function constraint_redispatch_active_power_gen(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, pref::AbstractFloat)
-    pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
-    pg = PowerModels.var(pm, n, cnd, :pg, i)
-
-    @constraint(pm.model, pg_delta >= pg - pref)
-    @constraint(pm.model, pg_delta >= -(pg - pref))
-end
-
-function constraint_redispatch_reactive_power_gen(pm::GenericPowerModel, n::Int,  cnd::Int, i::Int, qref::AbstractFloat)
-    qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
-    qg = PowerModels.var(pm, n, cnd, :qg, i)
-
-    @constraint(pm.model, qg_delta >= qg - qref)
-    @constraint(pm.model, qg_delta >= -(qg - qref))
-end
 # function constraint_redispatch_active_power_gen(pm::GenericPowerModel, n::Int, i::Int, pref::AbstractFloat)
 #     pg_delta = PowerModels.var(pm, n, :pg_delta)[i]
 #     pg = PowerModels.var(pm, n, :pg)[i]
@@ -147,24 +131,6 @@ end
 #     @constraint(pm.model, qg_delta >= qg - qref)
 #     @constraint(pm.model, qg_delta >= -(qg - qref))
 # end
-""
-function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, first_stage_network_id)
-    pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
-    pg = PowerModels.var(pm, n, cnd, :pg, i)
-    pg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pg, i)
-
-    @constraint(pm.model, pg_delta >= pg - pg_first_stage)
-    @constraint(pm.model, pg_delta >= -(pg - pg_first_stage))
-end
-
-function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, first_stage_network_id)
-    qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
-    qg = PowerModels.var(pm, n, cnd, :qg, i)
-    qg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :qg, i)
-
-    @constraint(pm.model, qg_delta >= qg - qg_first_stage)
-    @constraint(pm.model, qg_delta >= -(qg - qg_first_stage))
-end
 # function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel, n::Int, i::Int, first_stage_network_id)
 #     pg_delta = PowerModels.var(pm, n, :pg_delta)[i]
 #     pg = PowerModels.var(pm, n, :pg)[i]
