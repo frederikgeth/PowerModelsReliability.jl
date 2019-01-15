@@ -97,3 +97,28 @@ end
 # DO Nothing
 function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractDCPForm
 end
+
+function constraint_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, pref::AbstractFloat) where T <: PowerModels.AbstractDCPForm
+    pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
+    pl = PowerModels.var(pm, n, cnd, :pl, i)
+
+    @constraint(pm.model, pl_delta >= pl - pref)
+    @constraint(pm.model, pl_delta >= -(pl - pref))
+end
+
+# DO NOTING
+function constraint_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractDCPForm
+end
+
+function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractDCPForm
+    pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
+    pl = PowerModels.var(pm, n, cnd, :pl, i)
+    pl_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pl, i)
+
+    @constraint(pm.model, pl_delta >= pl - pl_first_stage)
+    @constraint(pm.model, pl_delta >= -(pl - pl_first_stage))
+end
+
+# DO NOTHING
+function constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractDCPForm
+end

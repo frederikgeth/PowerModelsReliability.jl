@@ -148,22 +148,6 @@ end
 #     @constraint(pm.model, qg_delta >= qg - qg_first_stage)
 #     @constraint(pm.model, qg_delta >= -(qg - qg_first_stage))
 # end
-""
-function constraint_redispatch_active_power_load(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, pref::AbstractFloat)
-    pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
-    pl = PowerModels.var(pm, n, cnd, :pl, i)
-
-    @constraint(pm.model, pl_delta >= pl - pref)
-    @constraint(pm.model, pl_delta >= -(pl - pref))
-end
-
-function constraint_redispatch_reactive_power_load(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, qref::AbstractFloat)
-    ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
-    ql = PowerModels.var(pm, n, cnd, :ql, i)
-
-    @constraint(pm.model, ql_delta >= ql - qref)
-    @constraint(pm.model, ql_delta >= -(ql - qref))
-end
 # function constraint_redispatch_active_power_load(pm::GenericPowerModel, n::Int, i::Int, pref::AbstractFloat)
 #     pl_delta = PowerModels.var(pm, n, :pl_delta)[i]
 #     pl = PowerModels.var(pm, n, :pl)[i]
@@ -179,25 +163,6 @@ end
 #     @constraint(pm.model, ql_delta >= ql - qref)
 #     @constraint(pm.model, ql_delta >= -(ql - qref))
 # end
-
-""
-function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, first_stage_network_id)
-    pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
-    pl = PowerModels.var(pm, n, cnd, :pl, i)
-    pl_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pl, i)
-
-    @constraint(pm.model, pl_delta >= pl - pl_first_stage)
-    @constraint(pm.model, pl_delta >= -(pl - pl_first_stage))
-end
-
-function constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel, n::Int, cnd::Int, i::Int, first_stage_network_id)
-    ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
-    ql = PowerModels.var(pm, n, cnd, :ql, i)
-    ql_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :ql, i)
-
-    @constraint(pm.model, ql_delta >= ql - ql_first_stage)
-    @constraint(pm.model, ql_delta >= -(ql - ql_first_stage))
-end
 # function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel, n::Int, i::Int, first_stage_network_id)
 #     pl_delta = PowerModels.var(pm, n, :pl_delta)[i]
 #     pl = PowerModels.var(pm, n, :pl)[i]
