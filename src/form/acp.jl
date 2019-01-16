@@ -7,7 +7,7 @@ q[f_idx] == -(b+c/2)*vm_tap[f_idx]^2 - (-b)*(vm_tap[f_idx]*vm_tap[t_idx]*cos((va
 vm_tap[f_idx] * tap_min <= vm[f_bus] <= vm_tap[f_idx] * tap_max
 ```
 """
-function constraint_variable_transformer_y_from{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
+function constraint_variable_transformer_y_from(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)  where T <: PowerModels.AbstractACPForm
     p_fr = PowerModels.var(pm, n, cnd, :p, f_idx)
     q_fr = PowerModels.var(pm, n, cnd, :q, f_idx)
     vm_fr = PowerModels.var(pm, n, cnd, :vm, f_bus)
@@ -24,7 +24,6 @@ function constraint_variable_transformer_y_from{T <: PowerModels.AbstractACPForm
     @constraint(pm.model, vm_tap_fr * tap_min <= vm_fr)
     @constraint(pm.model, vm_fr <= vm_tap_fr * tap_max)
 end
-
 """
 Creates Ohms constraints for shiftable PSTs / OLTCs
 
@@ -34,7 +33,7 @@ q[t_idx] == -(b+c/2)*vm_tap[t_idx]^2 - (-b)*(vm_tap[t_idx]*vm_tap[f_idx]*cos((va
 vm_tap[t_idx] * tap_min <= vm[t_bus] <= vm_tap[t_idx] * tap_max
 ```
 """
-function constraint_variable_transformer_y_to{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max)
+function constraint_variable_transformer_y_to(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, g, b, c, g_shunt, tap_min, tap_max) where T <: PowerModels.AbstractACPForm
     p_to = PowerModels.var(pm, n, cnd :p, t_idx)
     q_to = PowerModels.var(pm, n, cnd, :q, t_idx)
     vm_fr = PowerModels.var(pm, n, cnd, :vm, f_bus)
@@ -51,7 +50,6 @@ function constraint_variable_transformer_y_to{T <: PowerModels.AbstractACPForm}(
     @constraint(pm.model, vm_tap_to * tap_min <= vm_to)
     @constraint(pm.model, vm_to <= vm_tap_to * tap_max)
 end
-
 """
 Links voltage magnitudes of not tappable transformers with node voltage magnitudes
 
@@ -60,8 +58,7 @@ vm_tap[f_idx] * tap == vm[f_bus]
 vm_tap[t_idx] * tap == vm[t_bus]
 ```
 """
-
-function constraint_link_voltage_magnitudes{T <: PowerModels.AbstractACPForm}(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to)
+function constraint_link_voltage_magnitudes(pm::GenericPowerModel{T}, n::Int, cnd::Int, f_bus, t_bus, f_idx, t_idx, tap_fr, tap_to) where T <: PowerModels.AbstractACPForm
     vm_fr = PowerModels.var(pm, n, cnd, :vm, f_bus)
     vm_to = PowerModels.var(pm, n, cnd, :vm, t_bus)
     vm_tap_fr = PowerModels.var(pm, n, cnd, :vm_tap, f_idx)
@@ -69,7 +66,6 @@ function constraint_link_voltage_magnitudes{T <: PowerModels.AbstractACPForm}(pm
     @constraint(pm.model, vm_tap_fr * tap_fr == vm_fr)
     @constraint(pm.model, vm_tap_to * tap_to == vm_to)
 end
-
 """
 Aggregated unit representation in the nodes
 ```
@@ -90,22 +86,18 @@ function constraint_kcl_shunt_aggregated(pm::GenericPowerModel{T}, n::Int, cnd::
     @constraint(pm.model, sum(p[a] for a in bus_arcs) + sum(p_dc[a_dc] for a_dc in bus_arcs_dc) == pnode - sum(gs for gs in values(bus_gs))*vm^2)
     @constraint(pm.model, sum(q[a] for a in bus_arcs) + sum(q_dc[a_dc] for a_dc in bus_arcs_dc) == qnode + sum(bs for bs in values(bus_bs))*vm^2)
 end
-
-
 function constraint_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, pref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
     pg = PowerModels.var(pm, n, cnd, :pg, i)
 
     @NLconstraint(pm.model, pg_delta == abs(pg - pref))
 end
-
 function constraint_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int,  cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
     qg = PowerModels.var(pm, n, cnd, :qg, i)
 
     @NLconstraint(pm.model, qg_delta == abs(qg - qref))
 end
-
 function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
     pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
     pg = PowerModels.var(pm, n, cnd, :pg, i)
@@ -113,7 +105,6 @@ function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerMod
 
     @NLconstraint(pm.model, pg_delta == abs(pg - pg_first_stage))
 end
-
 function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
     qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
     qg = PowerModels.var(pm, n, cnd, :qg, i)
@@ -121,21 +112,18 @@ function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerM
 
     @NLconstraint(pm.model, qg_delta == abs(qg - qg_first_stage))
 end
-
 function constraint_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, pref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
     pl = PowerModels.var(pm, n, cnd, :pl, i)
 
     @NLconstraint(pm.model, pl_delta == abs(pl - pref))
 end
-
 function constraint_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
     ql = PowerModels.var(pm, n, cnd, :ql, i)
 
     @NLconstraint(pm.model, ql_delta == abs(ql - qref))
 end
-
 function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractACPForm
     pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
     pl = PowerModels.var(pm, n, cnd, :pl, i)
@@ -143,7 +131,6 @@ function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerMo
 
     @NLconstraint(pm.model, pl_delta == abs(pl - pl_first_stage))
 end
-
 function constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractACPForm
     ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
     ql = PowerModels.var(pm, n, cnd, :ql, i)

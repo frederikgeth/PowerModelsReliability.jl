@@ -11,7 +11,7 @@ add_load_model!(pm::GenericPowerModel) = add_load_model!(pm::GenericPowerModel, 
 function add_power_factor!(pm::GenericPowerModel, n::Int)
     load_angle = Dict([(i, []) for i in PowerModels.ids(pm, n,:load)])
      for (i,load) in PowerModels.ref(pm, n,:load)
-        push!(load_angle[i], atan2(load["qref"],load["pref"]))
+        push!(load_angle[i], atan(load["qref"],load["pref"]))
      end
      pm.ref[:nw][n][:load_angle] = load_angle
 

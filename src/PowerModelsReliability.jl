@@ -7,6 +7,11 @@ using JuMP
 using PowerModels
 PMs = PowerModels
 
+import Compat: @__MODULE__
+
+using Compat.LinearAlgebra
+using Compat.SparseArrays
+
 include("core/variable.jl")
 include("core/constraint_template.jl")
 include("core/constraint.jl")
