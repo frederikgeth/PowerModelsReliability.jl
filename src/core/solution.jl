@@ -104,23 +104,30 @@ end
 function add_risk(sol, pm::GenericPowerModel)
   add_case_level_setpoint(sol, pm, "first_stage_cost", :first_stage_cost)
   add_case_level_setpoint(sol, pm, "second_stage_risk", :second_stage_risk)
-  add_nw_level_setpoint(sol, pm, "dispatch_cost", :dispatch_cost)
-  add_nw_level_setpoint(sol, pm, "redispatch_cost", :redispatch_cost)
-  add_nw_level_setpoint(sol, pm, "loadshedding_cost", :loadshedding_cost)
+  PowerModels.add_setpoint(sol, pm, "contingencies", "dispatch_cost", :dispatch_cost)
+  PowerModels.add_setpoint(sol, pm, "contingencies", "redispatch_cost", :redispatch_cost)
+  PowerModels.add_setpoint(sol, pm, "contingencies", "loadshedding_cost", :loadshedding_cost)
+  # add_cont_level_setpoint(sol, pm, "contingencies", "dispatch_cost", :dispatch_cost)
+  # add_cont_level_setpoint(sol, pm, "contingencies", "redispatch_cost", :redispatch_cost)
+  # add_cont_level_setpoint(sol, pm, "contingencies", "loadshedding_cost", :loadshedding_cost)
 end
 ""
 function add_case_level_setpoint(sol, pm::GenericPowerModel, param_name, variable_symbol; scale = (x) -> x, extract_var = var -> var)
-        try
-            variable = extract_var(pm.var[variable_symbol])
-            sol[param_name] = scale(getvalue(variable))
-        catch
+        if !haskey(sol, param_name)
+            sol[param_name] = Dict()
         end
+        # print(pm.var[:nw][1][:cnd][pm.ccnd][variable_symbol])
+        # print(sol)
+        variable = extract_var(pm.var[:nw][1][:cnd][pm.ccnd][variable_symbol])
+        sol[param_name] = scale(getvalue(variable))
+        # catch
+        # end
 end
 ""
-function add_nw_level_setpoint(sol, pm::GenericPowerModel, param_name, variable_symbol; scale = (x) -> x, extract_var = var -> var)
-        try
-                variable = extract_var(pm.var[variable_symbol][pm.cnw])
-                sol[param_name] = scale(getvalue(variable))
-        catch
-        end
+function add_cont_level_setpoint(sol, pm::GenericPowerModel, dict_name, param_name, variable_symbol; scale = (x) -> x, extract_var = var -> var)
+    if !haskey(sol, dict_name)
+        sol[dict_name] = Dict()
+    end
+    sol[dict_name][param_name] = Dict()
+    sol[dict_name][param_name] = getvalue(extract_var(pm.var[:nw][1][:cnd][pm.ccnd][variable_symbol]))
 end

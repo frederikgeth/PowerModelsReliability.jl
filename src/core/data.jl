@@ -34,6 +34,11 @@ function process_additional_data!(data)
                 PowerModels.apply_func(branch, "shift_to_min", PowerModels.deg2rad)
             end
       end
+      if haskey(data, "contingencies")
+            for (c, cont) in data["contingencies"]
+                data["contingencies"][c]["index"] = parse(c)
+            end
+      end
   else
     for (n, network) in data["nw"]
         if haskey(data["nw"][n], "load")
@@ -65,6 +70,11 @@ function process_additional_data!(data)
                   PowerModels.apply_func(branch, "shift_fr_min", PowerModels.deg2rad)
                   PowerModels.apply_func(branch, "shift_to_max", PowerModels.deg2rad)
                   PowerModels.apply_func(branch, "shift_to_min", PowerModels.deg2rad)
+              end
+        end
+        if haskey(data["nw"][n], "contingencies")
+              for (c, cont) in data["nw"][n]["contingencies"]
+                  data["nw"][n]["contingencies"][c]["index"] = parse(c)
               end
         end
     end
