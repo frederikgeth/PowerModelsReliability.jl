@@ -90,51 +90,91 @@ function constraint_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int
     pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
     pg = PowerModels.var(pm, n, cnd, :pg, i)
 
-    @NLconstraint(pm.model, pg_delta == abs(pg - pref))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, pg_delta == abs(pg - pref))
+    else
+        @constraint(pm.model, pg_delta >= pg - pref)
+        @constraint(pm.model, pg_delta >= -(pg - pref))
+    end
 end
 function constraint_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int,  cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
     qg = PowerModels.var(pm, n, cnd, :qg, i)
 
-    @NLconstraint(pm.model, qg_delta == abs(qg - qref))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, qg_delta == abs(qg - qref))
+    else
+        @constraint(pm.model, qg_delta >= qg - qref)
+        @constraint(pm.model, qg_delta >= -(qg - qref))
+    end
 end
 function constraint_second_stage_redispatch_active_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
     pg_delta = PowerModels.var(pm, n, cnd, :pg_delta, i)
     pg = PowerModels.var(pm, n, cnd, :pg, i)
     pg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pg, i)
 
-    @NLconstraint(pm.model, pg_delta == abs(pg - pg_first_stage))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, pg_delta == abs(pg - pg_first_stage))
+    else
+        @constraint(pm.model, pg_delta >= pg - pg_first_stage)
+        @constraint(pm.model, pg_delta >= -(pg - pg_first_stage))
+    end
 end
 function constraint_second_stage_redispatch_reactive_power_gen(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id) where T <: PowerModels.AbstractACPForm
     qg_delta = PowerModels.var(pm, n, cnd, :qg_delta, i)
     qg = PowerModels.var(pm, n, cnd, :qg, i)
     qg_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :qg, i)
 
-    @NLconstraint(pm.model, qg_delta == abs(qg - qg_first_stage))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, qg_delta == abs(qg - qg_first_stage))
+    else
+        @constraint(pm.model, qg_delta >= qg - qg_first_stage)
+        @constraint(pm.model, qg_delta >= -(qg - qg_first_stage))
+    end
 end
 function constraint_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, pref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
     pl = PowerModels.var(pm, n, cnd, :pl, i)
 
-    @NLconstraint(pm.model, pl_delta == abs(pl - pref))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, pl_delta == abs(pl - pref))
+    else
+        @constraint(pm.model, pl_delta >= pl - pref)
+        @constraint(pm.model, pl_delta >= -(pl - pref))
+    end
 end
 function constraint_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, qref::AbstractFloat) where T <: PowerModels.AbstractACPForm
     ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
     ql = PowerModels.var(pm, n, cnd, :ql, i)
 
-    @NLconstraint(pm.model, ql_delta == abs(ql - qref))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, ql_delta == abs(ql - qref))
+    else
+        @constraint(pm.model, ql_delta >= ql - qref)
+        @constraint(pm.model, ql_delta >= -(ql - qref))
+    end
 end
 function constraint_second_stage_redispatch_active_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractACPForm
     pl_delta = PowerModels.var(pm, n, cnd, :pl_delta, i)
     pl = PowerModels.var(pm, n, cnd, :pl, i)
     pl_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :pl, i)
 
-    @NLconstraint(pm.model, pl_delta == abs(pl - pl_first_stage))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, pl_delta == abs(pl - pl_first_stage))
+    else
+        @constraint(pm.model, pl_delta >= pl - pl_first_stage)
+        @constraint(pm.model, pl_delta >= -(pl - pl_first_stage))
+    end
 end
 function constraint_second_stage_redispatch_reactive_power_load(pm::GenericPowerModel{T}, n::Int, cnd::Int, i::Int, first_stage_network_id)  where T <: PowerModels.AbstractACPForm
     ql_delta = PowerModels.var(pm, n, cnd, :ql_delta, i)
     ql = PowerModels.var(pm, n, cnd, :ql, i)
     ql_first_stage = PowerModels.var(pm, first_stage_network_id, cnd, :ql, i)
 
-    @NLconstraint(pm.model, ql_delta == abs(ql - ql_first_stage))
+    if pm.setting["relax_absolute_value"] == false
+        @NLconstraint(pm.model, ql_delta == abs(ql - ql_first_stage))
+    else
+        @constraint(pm.model, ql_delta >= ql - ql_first_stage)
+        @constraint(pm.model, ql_delta >= -(ql - ql_first_stage))
+    end
 end

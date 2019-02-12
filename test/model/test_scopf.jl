@@ -8,6 +8,7 @@ using Cbc
 using CPLEX
 
 mosek = MosekSolver()
+cplex = CplexSolver()
 ipopt = IpoptSolver()
 juniper = JuniperSolver(IpoptSolver(print_level=0); mip_solver=CplexSolver())
 
@@ -47,14 +48,16 @@ function build_mn_data(base_data_1, base_data_2)
 end
 
 data = build_mn_data("./test/data/case5_scopf.m")
-resultAC_rc = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
+resultAC_rc = run_scunittfopf(data, ACPPowerModel, ipopt; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true, "relax_absolute_value" => true))
 data = build_mn_data("./test/data/case5_scopf.m")
-resultAC = run_scunittfopf(data, ACPPowerModel, juniper; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false))
+resultAC = run_scunittfopf(data, ACPPowerModel, juniper; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false, "relax_absolute_value" => true))
 data = build_mn_data("./test/data/case5_scopf.m")
-resultDC_rc = run_scunittfopf(data, DCPPowerModel, mosek; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true))
+resultDC_rc = run_scunittfopf(data, DCPPowerModel, cplex; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => true, "relax_absolute_value" => false))
 data = build_mn_data("./test/data/case5_scopf.m")
-resultDC = run_scunittfopf(data, DCPPowerModel, mosek; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false))
+resultDC = run_scunittfopf(data, DCPPowerModel, cplex; multinetwork=true, setting = Dict("output" => Dict("branch_flows" => true),"relax_continuous" => false, "relax_absolute_value" => false))
 
+
+# ,"relax_absolute_value" => true
 #TODO
 # Fixes to make everything compatible
 # Extend data model with HVDC contingencies (Branch + Converter)
