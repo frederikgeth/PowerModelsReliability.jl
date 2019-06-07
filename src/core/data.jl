@@ -36,7 +36,7 @@ function process_additional_data!(data)
       end
       if haskey(data, "contingencies")
             for (c, cont) in data["contingencies"]
-                data["contingencies"][c]["index"] = parse(c)
+                data["contingencies"][c]["index"] = parse(Int, c)
             end
       end
   else
@@ -74,7 +74,7 @@ function process_additional_data!(data)
         end
         if haskey(data["nw"][n], "contingencies")
               for (c, cont) in data["nw"][n]["contingencies"]
-                  data["nw"][n]["contingencies"][c]["index"] = parse(c)
+                  data["nw"][n]["contingencies"][c]["index"] = parse(Int, c)
               end
         end
     end

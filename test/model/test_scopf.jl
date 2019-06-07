@@ -6,11 +6,20 @@ using Mosek
 using Juniper
 using Cbc
 using CPLEX
+using Gurobi
+using JuMP
+using SCS
 
-mosek = MosekSolver()
-cplex = CplexSolver()
-ipopt = IpoptSolver()
-juniper = JuniperSolver(IpoptSolver(print_level=0); mip_solver=CplexSolver())
+scs = JuMP.with_optimizer(SCS.Optimizer, max_iters=100000)
+ipopt = JuMP.with_optimizer(Ipopt.Optimizer, tol=1e-6, print_level=0)
+
+cplex = JuMP.with_optimizer(CPLEX.Optimizer)
+cbc = JuMP.with_optimizer(Cbc.Optimizer)
+gurobi = JuMP.with_optimizer(Gurobi.Optimizer)
+mosek = JuMP.with_optimizer(Mosek.Optimizer)
+
+
+juniper = JuMP.with_optimizer(Juniper.Optimizer, nl_solver = ipopt, mip_solver= cbc, time_limit= 7200)
 
 function build_mn_data(base_data)
     mp_data = PowerModels.parse_file(base_data)

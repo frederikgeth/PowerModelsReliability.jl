@@ -20,9 +20,9 @@ function variable_phase_shift(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm
     end
 
     PowerModels.var(pm, nw, cnd)[:va_shift] = @variable(pm.model,
-        [(l,i,j) in PowerModels.ref(pm, nw, :arcs)], basename="va_shift",
-        lowerbound = shift_min[(l,i,j)],
-        upperbound = shift_max[(l,i,j)],
+        [(l,i,j) in PowerModels.ref(pm, nw, :arcs)], base_name="va_shift",
+        lower_bound = shift_min[(l,i,j)],
+        upper_bound = shift_max[(l,i,j)],
         start = shift[(l,i,j)]
     )
 
@@ -46,9 +46,9 @@ function variable_voltage_tap(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm
     end
 
     PowerModels.var(pm, nw, cnd)[:vm_tap] = @variable(pm.model,
-        [(l,i,j) in PowerModels.ref(pm, nw, :arcs)], basename="vm_tap",
-        lowerbound = vm_tap_min[(l,i,j)],
-        upperbound = vm_tap_max[(l,i,j)],
+        [(l,i,j) in PowerModels.ref(pm, nw, :arcs)], base_name="vm_tap",
+        lower_bound = vm_tap_min[(l,i,j)],
+        upper_bound = vm_tap_max[(l,i,j)],
         start = vm_tap[(l,i,j)]
     )
 
@@ -57,12 +57,12 @@ end
 "variable unit aggregation"
 function variable_node_aggregation(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm, nw, cnd)[:pnode] = @variable(pm.model,
-    [i in PowerModels.ids(pm, nw, :bus)], basename="pnode",
+    [i in PowerModels.ids(pm, nw, :bus)], base_name="pnode",
     #start = PowerModels.getval(PowerModels.ref(pm, nw, :bus, i), "void", cnd, 0)
     )
 
     PowerModels.var(pm, nw, cnd)[:qnode] =@variable(pm.model,
-    [i in PowerModels.ids(pm, nw, :bus)], basename="qnode",
+    [i in PowerModels.ids(pm, nw, :bus)], base_name="qnode",
     #start = PowerModels.getval(PowerModels.ref(pm, nw, :bus, i), "void", cnd, 0)
     )
 
@@ -77,14 +77,14 @@ end
 function variable_active_load(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     if bounded
         PowerModels.var(pm, nw, cnd)[:pl] = @variable(pm.model,
-            [i in PowerModels.ids(pm, nw, :load)], basename="pl",
-            lowerbound = PowerModels.ref(pm, nw, :load, i, "pmin", cnd),
-            upperbound = PowerModels.ref(pm, nw, :load, i, "pmax", cnd),
+            [i in PowerModels.ids(pm, nw, :load)], base_name="pl",
+            lower_bound = PowerModels.ref(pm, nw, :load, i, "pmin", cnd),
+            upper_bound = PowerModels.ref(pm, nw, :load, i, "pmax", cnd),
             start = PowerModels.getval(PowerModels.ref(pm, nw, :load, i), "pl_start", cnd)
         )
     else
         PowerModels.var(pm, nw, cnd)[:pl] = @variable(pm.model,
-            [i in PowerModels.ids(pm, nw, :load)], basename="pl",
+            [i in PowerModels.ids(pm, nw, :load)], base_name="pl",
             start = PowerModels.getval(PowerModels.ref(pm, nw, :load, i), "pl_start", cnd)
         )
     end
@@ -93,14 +93,14 @@ end
 function variable_reactive_load(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     if bounded
         PowerModels.var(pm, nw, cnd)[:ql] = @variable(pm.model,
-            [i in PowerModels.ids(pm, nw, :load)], basename="ql",
-            lowerbound = PowerModels.ref(pm, nw, :load, i, "qmin", cnd),
-            upperbound = PowerModels.ref(pm, nw, :load, i, "qmax", cnd),
+            [i in PowerModels.ids(pm, nw, :load)], base_name="ql",
+            lower_bound = PowerModels.ref(pm, nw, :load, i, "qmin", cnd),
+            upper_bound = PowerModels.ref(pm, nw, :load, i, "qmax", cnd),
             start = PowerModels.getval(PowerModels.ref(pm, nw, :load, i), "ql_start", cnd)
         )
     else
         PowerModels.var(pm, nw, cnd)[:ql] = @variable(pm.model,
-            [i in PowerModels.ids(pm, nw, :load)], basename="ql",
+            [i in PowerModels.ids(pm, nw, :load)], base_name="ql",
             start = PowerModels.getval(PowerModels.ref(pm, nw, :load, i), "ql_start", cnd)
         )
     end
@@ -113,36 +113,36 @@ end
 function variable_load_action_indicator(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     if haskey(pm.setting,"relax_continuous") && pm.setting["relax_continuous"] == true
         PowerModels.var(pm, nw, cnd)[:load_ind] = @variable(pm.model,
-            [l in PowerModels.ids(pm, nw, :load)], basename="load_ind",
-            lowerbound = 1,
-            upperbound = 1,
+            [l in PowerModels.ids(pm, nw, :load)], base_name="load_ind",
+            lower_bound = 1,
+            upper_bound = 1,
             #start = PowerModels.getval(PowerModels.ref(pm, nw, :load, l), "void", cnd, 0)
         )
     else
         PowerModels.var(pm, nw, cnd)[:load_ind] = @variable(pm.model,
-            [l in PowerModels.ids(pm, nw, :load)], basename="load_ind",
-            lowerbound = 0,
-            upperbound = 1,
-            category = :Int,
-            #start = PowerModels.getval(PowerModels.ref(pm, nw, :load, l), "void", cnd, 0)
+            [l in PowerModels.ids(pm, nw, :load)], base_name="load_ind",
+            # lower_bound = 0,
+            # upper_bound = 1,
+            binary = true,
+            start = 0
         )
     end
 end
 function variable_gen_action_indicator(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     if haskey(pm.setting,"relax_continuous") && pm.setting["relax_continuous"] == true
         PowerModels.var(pm, nw, cnd)[:gen_ind] = @variable(pm.model,
-            [g in PowerModels.ids(pm, nw, :gen)], basename="gen_ind",
-            lowerbound = 1,
-            upperbound = 1,
+            [g in PowerModels.ids(pm, nw, :gen)], base_name="gen_ind",
+            lower_bound = 1,
+            upper_bound = 1,
             #start = PowerModels.getval(PowerModels.ref(pm, nw, :gen, g), "void", cnd, 0)
             )
     else
         PowerModels.var(pm, nw, cnd)[:gen_ind] = @variable(pm.model,
-            [g in PowerModels.ids(pm, nw, :gen)], basename="gen_ind",
-            lowerbound = 0,
-            upperbound = 1,
-            category = :Int,
-            #start = PowerModels.getval(PowerModels.ref(pm, nw, :gen, g), "void", cnd, 0)
+            [g in PowerModels.ids(pm, nw, :gen)], base_name="gen_ind",
+            # lower_bound = 0,
+            # upper_bound = 1,
+            binary = true,
+            start = 0
             )
     end
 end
@@ -154,33 +154,33 @@ function variable_auxiliary_power(pm::GenericPowerModel; kwargs...)
 end
 function variable_auxiliary_active_power_load(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm, nw, cnd)[:pl_delta] = @variable(pm.model,
-        [l in PowerModels.ids(pm, nw, :load)], basename="pl_delta",
-        lowerbound = 0,
-        upperbound = 2 * PowerModels.ref(pm, nw, :load, l, "prated", cnd),
+        [l in PowerModels.ids(pm, nw, :load)], base_name="pl_delta",
+        lower_bound = 0,
+        upper_bound = 2 * PowerModels.ref(pm, nw, :load, l, "prated", cnd),
         #start = PowerModels.getval(PowerModels.ref(pm, nw, :load, l), "void", cnd, 0)
     )
 end
 function variable_auxiliary_reactive_power_load(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm, nw, cnd)[:ql_delta] = @variable(pm.model,
-        [l in PowerModels.ids(pm, nw, :load)], basename="ql_delta",
-        lowerbound = 0,
-        upperbound = 2 * PowerModels.ref(pm, nw, :load, l, "qrated", cnd),
+        [l in PowerModels.ids(pm, nw, :load)], base_name="ql_delta",
+        lower_bound = 0,
+        upper_bound = 2 * PowerModels.ref(pm, nw, :load, l, "qrated", cnd),
         #start = PowerModels.getval(PowerModels.ref(pm, nw, :load, l), "void", cnd, 0)
     )
 end
 function variable_auxiliary_active_power_gen(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm, nw, cnd)[:pg_delta] = @variable(pm.model,
-        [g in PowerModels.ids(pm, nw, :gen)], basename="pg_delta",
-        lowerbound = 0,
-        upperbound = 2 * PowerModels.ref(pm, nw, :gen, g, "prated", cnd),
+        [g in PowerModels.ids(pm, nw, :gen)], base_name="pg_delta",
+        lower_bound = 0,
+        upper_bound = 2 * PowerModels.ref(pm, nw, :gen, g, "prated", cnd),
         #start = PowerModels.getval(PowerModels.ref(pm, nw, :gen, g), "void", cnd, 0)
     )
 end
 function variable_auxiliary_reactive_power_gen(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm, nw, cnd)[:qg_delta] = @variable(pm.model,
-        [g in PowerModels.ids(pm, nw, :gen)], basename="qg_delta",
-        lowerbound = 0,
-        upperbound = 2 * PowerModels.ref(pm, nw, :gen, g, "qrated", cnd),
+        [g in PowerModels.ids(pm, nw, :gen)], base_name="qg_delta",
+        lower_bound = 0,
+        upper_bound = 2 * PowerModels.ref(pm, nw, :gen, g, "qrated", cnd),
         #start = PowerModels.getval(PowerModels.ref(pm, nw, :gen, g), "void", cnd, 0)
     )
 end
@@ -190,36 +190,36 @@ function variable_risk(pm::GenericPowerModel; kwargs...)
 end
 function variable_first_stage_cost(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm)[:first_stage_cost] = @variable(pm.model,
-        basename="first_stage_cost",
-        lowerbound = 0,
-        upperbound = Inf,
+        base_name="first_stage_cost",
+        lower_bound = 0,
+        upper_bound = Inf,
         start = 0)
 end
 function variable_second_stage_risk(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm)[:second_stage_risk] = @variable(pm.model,
-        basename="second_stage_risk",
-        lowerbound = 0,
-        upperbound = Inf,
+        base_name="second_stage_risk",
+        lower_bound = 0,
+        upper_bound = Inf,
         start = 0)
 end
 function variable_dispatch_cost(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm)[:dispatch_cost] = @variable(pm.model, [n in keys(PowerModels.nws(pm))],
-        basename="dispatch_cost",
-        lowerbound = 0,
-        upperbound = Inf,
+        base_name="dispatch_cost",
+        lower_bound = 0,
+        upper_bound = Inf,
         start = 0)
 end
 function variable_redispatch_cost(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm)[:redispatch_cost] = @variable(pm.model, [n in keys(PowerModels.nws(pm))],
-        basename="redispatch_cost",
-        lowerbound = 0,
-        upperbound = Inf,
+        base_name="redispatch_cost",
+        lower_bound = 0,
+        upper_bound = Inf,
         start = 0)
 end
 function variable_loadshedding_cost(pm::GenericPowerModel; nw::Int=pm.cnw, cnd::Int=pm.ccnd, bounded::Bool = true)
     PowerModels.var(pm)[:loadshedding_cost] = @variable(pm.model, [n in keys(PowerModels.nws(pm))],
-        basename="loadshedding_cost",
-        lowerbound = 0,
-        upperbound = Inf,
+        base_name="loadshedding_cost",
+        lower_bound = 0,
+        upper_bound = Inf,
         start = 0)
 end
